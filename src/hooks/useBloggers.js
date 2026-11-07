@@ -3,9 +3,13 @@ import staticBloggers from "../data/bloggers";
 import { BACKEND_ENABLED } from "../lib/supabase";
 import { fetchApprovedBloggers, fetchBlogger } from "../lib/api";
 
-// Весь каталог: блогеры из файла bloggers.js + одобренные из базы.
+// Весь каталог.
+// - С подключённой базой блогеры берутся из неё (после переноса из bloggers.js
+//   они там тоже лежат, так что админка управляет всеми).
+//   Пока база грузится или недоступна, показываем блогеров из файла.
+// - Без базы работаем только с файлом bloggers.js.
 export function useBloggers() {
-  const [remote, setRemote] = useState([]);
+  const [remote, setRemote] = useState(null); // null — ещё не загрузили
 
   useEffect(() => {
     if (!BACKEND_ENABLED) return;
@@ -14,7 +18,7 @@ export function useBloggers() {
     fetchApprovedBloggers()
       .then((list) => alive && setRemote(list))
       .catch(() => {
-        // база недоступна — показываем хотя бы блогеров из файла
+        // база недоступна — остаёмся на блогерах из файла
       });
 
     return () => {
@@ -22,17 +26,17 @@ export function useBloggers() {
     };
   }, []);
 
-  return useMemo(() => [...staticBloggers, ...remote], [remote]);
+  return useMemo(() => (BACKEND_ENABLED && remote ? remote : staticBloggers), [remote]);
 }
 
-// Один блогер по id. Сначала ищем в файле, потом в базе.
+// Один блогер по id. С подключённой базой — только из базы,
+// чтобы удалённые в админке анкеты не открывались по старым ссылкам.
 export function useBlogger(id) {
   const numericId = Number(id);
-  const local = staticBloggers.find((item) => item.id === numericId) || null;
   const [remote, setRemote] = useState({ id: null, blogger: null });
 
   useEffect(() => {
-    if (local || !BACKEND_ENABLED || !Number.isFinite(numericId)) return;
+    if (!BACKEND_ENABLED || !Number.isFinite(numericId)) return;
 
     let alive = true;
     fetchBlogger(numericId)
@@ -42,13 +46,18 @@ export function useBlogger(id) {
     return () => {
       alive = false;
     };
-  }, [local, numericId]);
+  }, [numericId]);
 
-  if (local) return { blogger: local, loading: false };
+  if (!BACKEND_ENABLED) {
+    return {
+      blogger: staticBloggers.find((item) => item.id === numericId) || null,
+      loading: false,
+    };
+  }
 
   const loaded = remote.id === numericId;
   return {
     blogger: loaded ? remote.blogger : null,
-    loading: BACKEND_ENABLED && Number.isFinite(numericId) && !loaded,
+    loading: Number.isFinite(numericId) && !loaded,
   };
 }

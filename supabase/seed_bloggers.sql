@@ -1,0 +1,86 @@
+-- =========================================================
+--  DARKOR — перенос блогеров из файла bloggers.js в базу данных
+--  Запускать ПОСЛЕ schema.sql: Supabase → SQL Editor → вставить → Run.
+--
+--  Блогеры сохраняют свои номера из bloggers.js, поэтому старые ссылки
+--  вида /blogger/3 продолжают работать. Фото лежат в public/bloggers/.
+--  Порядок в каталоге такой же, как в файле.
+--  Скрипт можно запускать повторно: уже перенесённые блогеры
+--  не перезаписываются (ваши правки в базе сохраняются).
+-- =========================================================
+
+insert into public.bloggers
+  (id, name, city, gender, category, instagram, tiktok, youtube, price,
+   description, image_url, views, likes, engagement, tags, formats, status, created_at)
+values
+  (1, 'M-Favik', 'Фаридун Сафаров', 'Мужчина', 'Вайнер',
+   null, null, null, 0,
+   'Развлекательный digital-креатор и блогер.',
+   '/bloggers/Favik.jpg', null, null, null,
+   array['Фаридун Сафаров', 'Faridun Safarov', 'Паук', 'Модарвасеписар'],
+   array['Instagram Stories', 'Instagram Reels', 'TikTok', 'Рекламная интеграция'],
+   'approved', timestamptz '2026-01-01 00:00:00+00' + interval '0 minutes'),
+  (2, 'Nek.xxl', 'Некру Худойбердиев', 'Мужчина', 'Вайнер',
+   null, null, null, 0,
+   'Популярный digital-креатор и развлекательный блогер.',
+   '/bloggers/NekXXl.jpg', null, null, null,
+   array['Некру', 'xxl', 'nek'],
+   array['Instagram Stories', 'Instagram Reels', 'TikTok', 'Рекламная интеграция'],
+   'approved', timestamptz '2026-01-01 00:00:00+00' + interval '1 minutes'),
+  (3, 'Showshotime', 'Шоира Пулатова', 'Женщина', 'Lifestyle',
+   null, null, null, 0,
+   'Развлекательный блогер и создатель digital-контента.',
+   '/bloggers/showshotime.jpg', null, null, null,
+   array['Showshotime', 'Shoira Pulatova'],
+   array['Instagram Stories', 'Instagram Reels', 'TikTok', 'Рекламная интеграция'],
+   'approved', timestamptz '2026-01-01 00:00:00+00' + interval '2 minutes'),
+  (4, 'Abdoovalijon', 'Абдували Сохибов', 'Мужчина', 'Lifestyle',
+   null, null, null, 0,
+   'Создатель контента и digital-креатор.',
+   '/bloggers/Abdoovalijon.jpg', null, null, null,
+   array['Abdovali Sohibov', 'Бегзот', 'Panj Deg', 'ПанчДег', 'Бехзод', 'Бегзодака', 'ош'],
+   array['Instagram Stories', 'Instagram Reels', 'TikTok', 'Рекламная интеграция'],
+   'approved', timestamptz '2026-01-01 00:00:00+00' + interval '3 minutes'),
+  (5, 'Afandivines', 'Насимчон Мирзошарипов', 'Мужчина', 'Вайнер',
+   null, null, null, 0,
+   'Комедийный digital-креатор и автор развлекательного контента.',
+   '/bloggers/afandi.jpg', null, null, null,
+   '{}',
+   array['Instagram Stories', 'Instagram Reels', 'TikTok', 'Рекламная интеграция'],
+   'approved', timestamptz '2026-01-01 00:00:00+00' + interval '4 minutes'),
+  (6, 'Golib_shov', 'Голиб Мусоев', 'Мужчина', 'Вайнер',
+   null, null, null, 0,
+   'Развлекательный блогер и создатель коротких видео.',
+   '/bloggers/GolibMusoev.jpg', null, null, null,
+   '{}',
+   array['Instagram Stories', 'Instagram Reels', 'TikTok', 'Рекламная интеграция'],
+   'approved', timestamptz '2026-01-01 00:00:00+00' + interval '5 minutes'),
+  (7, 'Taj Deeshay', 'Дилшод Шарипов', 'Мужчина', 'Вайнер',
+   null, null, null, 0,
+   'Digital-креатор и автор развлекательного контента.',
+   '/bloggers/DeeShay.jpg', null, null, null,
+   '{}',
+   array['Instagram Stories', 'Instagram Reels', 'TikTok', 'Рекламная интеграция'],
+   'approved', timestamptz '2026-01-01 00:00:00+00' + interval '6 minutes'),
+  (10, 'Gulnoza_khojaeva', 'Гулноза Хочаева', 'Женщина', 'Lifestyle',
+   null, null, null, 0,
+   'Digital-креатор и блогер.',
+   '/bloggers/GulnozaKh.jpg', null, null, null,
+   '{}',
+   array['Instagram Stories', 'Instagram Reels', 'TikTok', 'Рекламная интеграция'],
+   'approved', timestamptz '2026-01-01 00:00:00+00' + interval '7 minutes'),
+  (11, 'Sabrinai_Nazri_official', 'Сабринаи Назри', 'Женщина', 'Lifestyle',
+   null, null, null, 0,
+   'Digital-креатор и блогер.',
+   '/bloggers/SabrinaiNazri.jpg', null, null, null,
+   '{}',
+   array['Instagram Stories', 'Instagram Reels', 'TikTok', 'Рекламная интеграция'],
+   'approved', timestamptz '2026-01-01 00:00:00+00' + interval '8 minutes'),
+  (9, '_said_shukurov_', 'Саидакрам Шукуров', 'Мужчина', 'Lifestyle',
+   null, null, null, 0,
+   'Digital-креатор и блогер.',
+   '/bloggers/SaidShukurov.jpg', null, null, null,
+   '{}',
+   array['Instagram Stories', 'Instagram Reels', 'TikTok', 'Рекламная интеграция'],
+   'approved', timestamptz '2026-01-01 00:00:00+00' + interval '9 minutes')
+on conflict (id) do nothing;

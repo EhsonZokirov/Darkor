@@ -54,8 +54,7 @@ function OrderModal({ blogger, onClose }) {
       },
       () =>
         sendAdRequest({
-          // у блогеров из файла bloggers.js (id 1–10) в базе записи нет
-          blogger_id: blogger.id >= 1000 ? blogger.id : null,
+          blogger_id: blogger.id,
           blogger_name: blogger.name,
           name: form.name.trim(),
           contact: form.contact.trim(),

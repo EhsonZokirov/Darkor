@@ -38,6 +38,7 @@ export async function fetchApprovedBloggers() {
       .select("*")
       .eq("status", "approved")
       .order("created_at", { ascending: true })
+      .order("id", { ascending: true })
   );
   return rows.map(toBlogger);
 }

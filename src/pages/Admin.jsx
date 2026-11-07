@@ -297,9 +297,11 @@ function Admin() {
                     type="button"
                     className="btn btn-danger"
                     disabled={busyId === `ad-${item.id}`}
-                    onClick={() =>
-                      run(`ad-${item.id}`, () => adminDeleteRow("ad_requests", item.id))
-                    }
+                    onClick={() => {
+                      if (window.confirm("Удалить эту заявку навсегда?")) {
+                        run(`ad-${item.id}`, () => adminDeleteRow("ad_requests", item.id));
+                      }
+                    }}
                   >
                     Удалить
                   </button>
@@ -331,9 +333,11 @@ function Admin() {
                     type="button"
                     className="btn btn-danger"
                     disabled={busyId === `msg-${item.id}`}
-                    onClick={() =>
-                      run(`msg-${item.id}`, () => adminDeleteRow("messages", item.id))
-                    }
+                    onClick={() => {
+                      if (window.confirm("Удалить это сообщение навсегда?")) {
+                        run(`msg-${item.id}`, () => adminDeleteRow("messages", item.id));
+                      }
+                    }}
                   >
                     Удалить
                   </button>
