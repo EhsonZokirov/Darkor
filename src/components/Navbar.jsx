@@ -3,6 +3,7 @@ import { Link, NavLink } from "react-router-dom";
 import Logo from "./Logo";
 import { useAuth } from "../context/auth";
 import { useLang } from "../i18n/lang";
+import ThemeToggle from "./ThemeToggle";
 import { BACKEND_ENABLED } from "../lib/supabase";
 
 const LINKS = [
@@ -95,6 +96,8 @@ function Navbar() {
           >
             {t("Добавить блогера")}
           </Link>
+
+          <ThemeToggle />
 
           <div className="lang-switch" role="group" aria-label={t("Язык")}>
             {[
