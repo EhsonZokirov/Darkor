@@ -7,8 +7,8 @@ export const BRAND = {
 };
 
 export const CONTACT = {
-  email: "Darkor@gmail.com", // TODO: замените на почту DARKOR
-  instagram: "Darkor.tj", // TODO: замените на аккаунт DARKOR (без @)
+  email: "Darkor@gmail.com",
+  instagram: "Darkor.tj", // без @
   location: "Душанбе, Таджикистан",
 };
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import BloggerEditor from "../components/BloggerEditor";
 import { useAuth } from "../context/auth";
 import { BACKEND_ENABLED } from "../lib/supabase";
 import {
@@ -10,6 +11,7 @@ import {
   adminListMessages,
   adminSetStatus,
 } from "../lib/api";
+import { useT } from "../i18n/lang";
 
 const STATUS_LABEL = {
   pending: "На проверке",
@@ -39,11 +41,12 @@ const formatDate = (value) =>
   new Date(value).toLocaleString("ru-RU", { dateStyle: "short", timeStyle: "short" });
 
 function Shell({ children }) {
+  const t = useT();
   return (
     <main className="admin-page">
       <section className="admin-head">
         <span className="section-label">DARKOR</span>
-        <h1>Админ-панель</h1>
+        <h1>{t("Админ-панель")}</h1>
       </section>
       {children}
     </main>
@@ -51,13 +54,14 @@ function Shell({ children }) {
 }
 
 function Notice({ title, text, to, action }) {
+  const t = useT();
   return (
     <div className="form-success card-surface admin-notice">
-      <h2>{title}</h2>
-      <p>{text}</p>
+      <h2>{t(title)}</h2>
+      <p>{t(text)}</p>
       {to && (
         <Link to={to} className="btn btn-primary">
-          {action}
+          {t(action)}
         </Link>
       )}
     </div>
@@ -65,6 +69,7 @@ function Notice({ title, text, to, action }) {
 }
 
 function Admin() {
+  const t = useT();
   const { user, role, loading, signOut } = useAuth();
   const isAdmin = role === "admin";
 
@@ -72,6 +77,7 @@ function Admin() {
   const [tab, setTab] = useState("bloggers");
   const [filter, setFilter] = useState("pending");
   const [busyId, setBusyId] = useState(null);
+  const [editingId, setEditingId] = useState(null);
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -113,7 +119,7 @@ function Admin() {
     return (
       <Shell>
         <Notice
-          title="База данных не подключена"
+          title={t("База данных не подключена")}
           text="Админка заработает после подключения Supabase (см. README, раздел «Бэкенд»)."
         />
       </Shell>
@@ -123,7 +129,7 @@ function Admin() {
   if (loading || (user && role === null)) {
     return (
       <Shell>
-        <Notice title="Загрузка..." text="" />
+        <Notice title={t("Загрузка...")} text="" />
       </Shell>
     );
   }
@@ -132,7 +138,7 @@ function Admin() {
     return (
       <Shell>
         <Notice
-          title="Нужен вход"
+          title={t("Нужен вход")}
           text="Войдите под аккаунтом администратора."
           to="/login?next=/admin"
           action="Войти"
@@ -145,8 +151,8 @@ function Admin() {
     return (
       <Shell>
         <Notice
-          title="Нет доступа"
-          text={`Аккаунт ${user.email} не является администратором.`}
+          title={t("Нет доступа")}
+          text={t("Аккаунт {email} не является администратором.", { email: user.email })}
           to="/"
           action="На главную"
         />
@@ -168,7 +174,7 @@ function Admin() {
       <p className="account-line">
         {user.email} ·{" "}
         <button type="button" onClick={signOut}>
-          Выйти
+          {t("Выйти")}
         </button>
       </p>
 
@@ -182,14 +188,14 @@ function Admin() {
             className={`chip ${tab === item.value ? "active" : ""}`}
             onClick={() => setTab(item.value)}
           >
-            {item.label}
+            {t(item.label)}
             {item.count > 0 && <span className="admin-count">{item.count}</span>}
           </button>
         ))}
       </div>
 
-      {data.error && <p className="form-error">Ошибка: {data.error}</p>}
-      {!data.loaded && <p className="admin-empty">Загрузка...</p>}
+      {data.error && <p className="form-error">{t("Ошибка:")} {data.error}</p>}
+      {!data.loaded && <p className="admin-empty">{t("Загрузка...")}</p>}
 
       {data.loaded && tab === "bloggers" && (
         <>
@@ -202,15 +208,28 @@ function Admin() {
                 aria-pressed={filter === item.value}
                 onClick={() => setFilter(item.value)}
               >
-                {item.label}
+                {t(item.label)}
               </button>
             ))}
           </div>
 
-          {visible.length === 0 && <p className="admin-empty">Здесь пока пусто.</p>}
+          {visible.length === 0 && <p className="admin-empty">{t("Здесь пока пусто.")}</p>}
 
           <div className="admin-list">
-            {visible.map((item) => (
+            {visible.map((item) =>
+              editingId === item.id ? (
+                <article className="admin-item card-surface editing" key={item.id}>
+                  <BloggerEditor
+                    item={item}
+                    adminId={user.id}
+                    onCancel={() => setEditingId(null)}
+                    onSaved={async () => {
+                      await reload();
+                      setEditingId(null);
+                    }}
+                  />
+                </article>
+              ) : (
               <article className="admin-item card-surface" key={item.id}>
                 {item.image_url && <img src={item.image_url} alt={item.name} />}
 
@@ -218,16 +237,16 @@ function Admin() {
                   <div className="admin-item-top">
                     <h3>{item.name}</h3>
                     <span className={`status-badge status-${item.status}`}>
-                      {STATUS_LABEL[item.status]}
+                      {t(STATUS_LABEL[item.status])}
                     </span>
                   </div>
 
                   <p className="admin-meta">
-                    {item.city} · {item.gender} · {item.category} ·{" "}
-                    {item.price > 0 ? `${item.price} сом` : "цена по запросу"}
+                    {item.city} · {t(item.gender)} · {t(item.category)} ·{" "}
+                    {item.price > 0 ? `${item.price} ${t("сом")}` : t("цена по запросу")}
                   </p>
                   <p className="admin-meta">
-                    Контакт: <strong>{item.contact || "—"}</strong>
+                    {t("Контакт:")} <strong>{item.contact || "—"}</strong>
                   </p>
                   <p className="admin-meta">
                     IG: {item.instagram || "—"} · TikTok: {item.tiktok || "—"} · YouTube:{" "}
@@ -236,6 +255,14 @@ function Admin() {
                   <p className="admin-text">{item.description}</p>
 
                   <div className="admin-actions">
+                    <button
+                      type="button"
+                      className="btn btn-ghost"
+                      disabled={busyId === item.id}
+                      onClick={() => setEditingId(item.id)}
+                    >
+                      {t("Редактировать")}
+                    </button>
                     {item.status !== "approved" && (
                       <button
                         type="button"
@@ -243,7 +270,7 @@ function Admin() {
                         disabled={busyId === item.id}
                         onClick={() => run(item.id, () => adminSetStatus(item.id, "approved"))}
                       >
-                        Одобрить
+                        {t("Одобрить")}
                       </button>
                     )}
                     {item.status !== "rejected" && (
@@ -253,7 +280,7 @@ function Admin() {
                         disabled={busyId === item.id}
                         onClick={() => run(item.id, () => adminSetStatus(item.id, "rejected"))}
                       >
-                        Отклонить
+                        {t("Отклонить")}
                       </button>
                     )}
                     <button
@@ -261,30 +288,31 @@ function Admin() {
                       className="btn btn-danger"
                       disabled={busyId === item.id}
                       onClick={() => {
-                        if (window.confirm(`Удалить анкету «${item.name}» навсегда?`)) {
+                        if (window.confirm(t("Удалить анкету «{name}» навсегда?", { name: item.name }))) {
                           run(item.id, () => adminDeleteBlogger(item.id));
                         }
                       }}
                     >
-                      Удалить
+                      {t("Удалить")}
                     </button>
                   </div>
                 </div>
               </article>
-            ))}
+              )
+            )}
           </div>
         </>
       )}
 
       {data.loaded && tab === "ads" && (
         <div className="admin-list">
-          {data.ads.length === 0 && <p className="admin-empty">Заявок пока нет.</p>}
+          {data.ads.length === 0 && <p className="admin-empty">{t("Заявок пока нет.")}</p>}
 
           {data.ads.map((item) => (
             <article className="admin-item card-surface" key={item.id}>
               <div className="admin-item-body">
                 <div className="admin-item-top">
-                  <h3>Блогер: {item.blogger_name}</h3>
+                  <h3>{t("Блогер:")} {item.blogger_name}</h3>
                   <span className="admin-date">{formatDate(item.created_at)}</span>
                 </div>
                 <p className="admin-meta">
@@ -298,12 +326,12 @@ function Admin() {
                     className="btn btn-danger"
                     disabled={busyId === `ad-${item.id}`}
                     onClick={() => {
-                      if (window.confirm("Удалить эту заявку навсегда?")) {
+                      if (window.confirm(t("Удалить эту заявку навсегда?"))) {
                         run(`ad-${item.id}`, () => adminDeleteRow("ad_requests", item.id));
                       }
                     }}
                   >
-                    Удалить
+                    {t("Удалить")}
                   </button>
                 </div>
               </div>
@@ -314,7 +342,7 @@ function Admin() {
 
       {data.loaded && tab === "messages" && (
         <div className="admin-list">
-          {data.messages.length === 0 && <p className="admin-empty">Сообщений пока нет.</p>}
+          {data.messages.length === 0 && <p className="admin-empty">{t("Сообщений пока нет.")}</p>}
 
           {data.messages.map((item) => (
             <article className="admin-item card-surface" key={item.id}>
@@ -334,12 +362,12 @@ function Admin() {
                     className="btn btn-danger"
                     disabled={busyId === `msg-${item.id}`}
                     onClick={() => {
-                      if (window.confirm("Удалить это сообщение навсегда?")) {
+                      if (window.confirm(t("Удалить это сообщение навсегда?"))) {
                         run(`msg-${item.id}`, () => adminDeleteRow("messages", item.id));
                       }
                     }}
                   >
-                    Удалить
+                    {t("Удалить")}
                   </button>
                 </div>
               </div>

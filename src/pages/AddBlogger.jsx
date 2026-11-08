@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { CATEGORIES, CONTACT, GENDERS } from "../config";
+import Honeypot from "../components/Honeypot";
+import PrivacyConsent from "../components/PrivacyConsent";
 import { useAuth } from "../context/auth";
 import { useFormSubmit } from "../hooks/useFormSubmit";
 import { CONTACT_HINT, isValidContact } from "../lib/validate";
 import { BACKEND_ENABLED } from "../lib/supabase";
 import { fetchMyBlogger, saveMyBlogger, uploadAvatar } from "../lib/api";
+import { useT } from "../i18n/lang";
 
 const EMPTY = {
   name: "",
@@ -31,11 +34,12 @@ const STATUS_TEXT = {
 };
 
 function Field({ id, label, error, children }) {
+  const t = useT();
   return (
     <div className="form-group">
       <label htmlFor={id}>{label}</label>
       {children}
-      {error && <span className="field-error">{error}</span>}
+      {error && <span className="field-error">{t(error)}</span>}
     </div>
   );
 }
@@ -58,6 +62,7 @@ function toForm(row) {
 }
 
 function Hero() {
+  const t = useT();
   return (
     <section className="page-hero">
       <div className="page-hero-bg" aria-hidden="true">
@@ -69,14 +74,13 @@ function Hero() {
         <span className="section-label">DARKOR</span>
 
         <h1>
-          Добавьте себя
+          {t("Добавьте себя")}
           <br />
-          <span>в каталог блогеров</span>
+          <span>{t("в каталог блогеров")}</span>
         </h1>
 
         <p>
-          Представьте себя брендам и рекламодателям. Заполните форму, чтобы
-          попасть в каталог DARKOR.
+          {t("Представьте себя брендам и рекламодателям. Заполните форму, чтобы попасть в каталог DARKOR.")}
         </p>
       </div>
     </section>
@@ -86,6 +90,7 @@ function Hero() {
 // user = null — работаем без аккаунта (заявка уходит письмом),
 // user задан — анкета сохраняется в базе и проходит модерацию.
 function AddBloggerForm({ user }) {
+  const t = useT();
   const { signOut } = useAuth();
   const [form, setForm] = useState(EMPTY);
   const [errors, setErrors] = useState({});
@@ -136,11 +141,11 @@ function AddBloggerForm({ user }) {
     if (!file) return;
 
     if (!PHOTO_TYPES.includes(file.type)) {
-      setErrors((current) => ({ ...current, photo: "Нужен файл JPG, PNG или WebP" }));
+      setErrors((current) => ({ ...current, photo: t("Нужен файл JPG, PNG или WebP") }));
       return;
     }
     if (file.size > MAX_PHOTO_BYTES) {
-      setErrors((current) => ({ ...current, photo: "Фото больше 3 МБ" }));
+      setErrors((current) => ({ ...current, photo: t("Фото больше 3 МБ") }));
       return;
     }
 
@@ -151,25 +156,25 @@ function AddBloggerForm({ user }) {
   function validate() {
     const next = {};
 
-    if (form.name.trim().length < 2) next.name = "Введите имя или псевдоним";
-    if (form.city.trim().length < 2) next.city = "Укажите город";
-    if (!form.gender) next.gender = "Выберите пол";
-    if (!form.category) next.category = "Выберите категорию";
+    if (form.name.trim().length < 2) next.name = t("Введите имя или псевдоним");
+    if (form.city.trim().length < 2) next.city = t("Укажите город");
+    if (!form.gender) next.gender = t("Выберите пол");
+    if (!form.category) next.category = t("Выберите категорию");
     if (!isValidContact(form.contact)) next.contact = CONTACT_HINT;
 
     if (!form.instagram.trim() && !form.tiktok.trim() && !form.youtube.trim()) {
-      next.instagram = "Добавьте хотя бы одну социальную сеть";
+      next.instagram = t("Добавьте хотя бы одну социальную сеть");
     }
 
     if (form.price.trim() && !/\d/.test(form.price)) {
-      next.price = "Укажите цену цифрами, например: от 500";
+      next.price = t("Укажите цену цифрами, например: от 500");
     }
 
     if (form.description.trim().length < 10) {
-      next.description = "Расскажите о себе хотя бы в одном-двух предложениях";
+      next.description = t("Расскажите о себе хотя бы в одном-двух предложениях");
     }
 
-    if (!form.agree) next.agree = "Нужно ваше согласие на публикацию";
+    if (!form.agree) next.agree = t("Нужно ваше согласие на публикацию");
 
     return next;
   }
@@ -259,52 +264,54 @@ function AddBloggerForm({ user }) {
       <section className="add-blogger-form-section">
         {user && (
           <p className="account-line">
-            Вы вошли как <strong>{user.email}</strong> ·{" "}
+            {t("Вы вошли как")} <strong>{user.email}</strong> ·{" "}
             <button type="button" onClick={signOut}>
-              Выйти
+              {t("Выйти")}
             </button>
           </p>
         )}
 
         {loadingMine ? (
           <div className="form-success card-surface">
-            <p>Загружаем вашу анкету...</p>
+            <p>{t("Загружаем вашу анкету...")}</p>
           </div>
         ) : status === "done" ? (
           <div className="form-success card-surface">
             <span className="success-icon">✓</span>
-            <h2>{user ? "Анкета сохранена!" : "Заявка готова!"}</h2>
+            <h2>{user ? t("Анкета сохранена!") : t("Заявка готова!")}</h2>
             <p>
               {via === "mailto"
-                ? `Откроется ваша почта — нажмите «Отправить», и мы получим заявку. Если письмо не открылось, напишите нам на ${CONTACT.email}.`
+                ? t("Откроется ваша почта — нажмите «Отправить», и мы получим заявку. Если письмо не открылось, напишите нам на {email}.", { email: CONTACT.email })
                 : via === "backend"
-                  ? "Мы проверим анкету и опубликуем её в каталоге. Статус всегда виден на этой странице."
-                  : "Мы получили вашу заявку и свяжемся с вами после проверки."}
+                  ? t("Мы проверим анкету и опубликуем её в каталоге. Статус всегда виден на этой странице.")
+                  : t("Мы получили вашу заявку и свяжемся с вами после проверки.")}
             </p>
 
             <div className="success-actions">
               <Link to="/bloggers" className="btn btn-primary">
-                Смотреть каталог
+                {t("Смотреть каталог")}
               </Link>
               <button type="button" className="btn btn-ghost" onClick={startOver}>
-                {user ? "Редактировать анкету" : "Отправить ещё одну"}
+                {user ? t("Редактировать анкету") : t("Отправить ещё одну")}
               </button>
             </div>
           </div>
         ) : (
           <form className="add-blogger-form" onSubmit={handleSubmit} noValidate>
+            {!user && <Honeypot value={mail.trap} onChange={mail.setTrap} />}
+
             {existing && (
               <div className={`status-banner status-${existing.status}`}>
                 <strong>
                   {existing.status === "approved"
-                    ? "Опубликована"
+                    ? t("Опубликована")
                     : existing.status === "rejected"
-                      ? "Отклонена"
-                      : "На проверке"}
+                      ? t("Отклонена")
+                      : t("На проверке")}
                 </strong>
-                <span>{STATUS_TEXT[existing.status]}</span>
+                <span>{t(STATUS_TEXT[existing.status])}</span>
                 {existing.status === "approved" && (
-                  <Link to={`/blogger/${existing.id}`}>Открыть мой профиль →</Link>
+                  <Link to={`/blogger/${existing.id}`}>{t("Открыть мой профиль →")}</Link>
                 )}
               </div>
             )}
@@ -312,35 +319,35 @@ function AddBloggerForm({ user }) {
             <div className="form-header">
               <span className="form-number">01</span>
               <div>
-                <h2>Основная информация</h2>
-                <p>Расскажите немного о себе</p>
+                <h2>{t("Основная информация")}</h2>
+                <p>{t("Расскажите немного о себе")}</p>
               </div>
             </div>
 
             <div className="form-grid">
-              <Field id="ab-name" label="Имя или псевдоним" error={errors.name}>
+              <Field id="ab-name" label={t("Имя или псевдоним")} error={errors.name}>
                 <input
                   id="ab-name"
                   type="text"
                   value={form.name}
                   onChange={(event) => update("name", event.target.value)}
-                  placeholder="Например: M-Favik"
+                  placeholder={t("Например: M-Favik")}
                   aria-invalid={Boolean(errors.name)}
                 />
               </Field>
 
-              <Field id="ab-city" label="Город" error={errors.city}>
+              <Field id="ab-city" label={t("Город")} error={errors.city}>
                 <input
                   id="ab-city"
                   type="text"
                   value={form.city}
                   onChange={(event) => update("city", event.target.value)}
-                  placeholder="Например: Душанбе"
+                  placeholder={t("Например: Душанбе")}
                   aria-invalid={Boolean(errors.city)}
                 />
               </Field>
 
-              <Field id="ab-gender" label="Пол" error={errors.gender}>
+              <Field id="ab-gender" label={t("Пол")} error={errors.gender}>
                 <select
                   id="ab-gender"
                   value={form.gender}
@@ -348,17 +355,17 @@ function AddBloggerForm({ user }) {
                   aria-invalid={Boolean(errors.gender)}
                 >
                   <option value="" disabled>
-                    Выберите пол
+                    {t("Выберите пол")}
                   </option>
                   {GENDERS.map((gender) => (
                     <option key={gender} value={gender}>
-                      {gender}
+                      {t(gender)}
                     </option>
                   ))}
                 </select>
               </Field>
 
-              <Field id="ab-category" label="Категория контента" error={errors.category}>
+              <Field id="ab-category" label={t("Категория контента")} error={errors.category}>
                 <select
                   id="ab-category"
                   value={form.category}
@@ -366,11 +373,11 @@ function AddBloggerForm({ user }) {
                   aria-invalid={Boolean(errors.category)}
                 >
                   <option value="" disabled>
-                    Выберите категорию
+                    {t("Выберите категорию")}
                   </option>
                   {CATEGORIES.map((category) => (
                     <option key={category} value={category}>
-                      {category}
+                      {t(category)}
                     </option>
                   ))}
                 </select>
@@ -378,7 +385,7 @@ function AddBloggerForm({ user }) {
 
               <Field
                 id="ab-contact"
-                label="Как с вами связаться (не публикуется)"
+                label={t("Как с вами связаться (не публикуется)")}
                 error={errors.contact}
               >
                 <input
@@ -386,15 +393,15 @@ function AddBloggerForm({ user }) {
                   type="text"
                   value={form.contact}
                   onChange={(event) => update("contact", event.target.value)}
-                  placeholder="+992 ... или @username"
+                  placeholder={t("+992 ... или @username")}
                   aria-invalid={Boolean(errors.contact)}
                 />
               </Field>
 
               {user && (
-                <Field id="ab-photo" label="Фото (JPG, PNG или WebP, до 3 МБ)" error={errors.photo}>
+                <Field id="ab-photo" label={t("Фото (JPG, PNG или WebP, до 3 МБ)")} error={errors.photo}>
                   <div className="photo-upload">
-                    {photoSrc && <img src={photoSrc} alt="Ваше фото" />}
+                    {photoSrc && <img src={photoSrc} alt={t("Ваше фото")} />}
                     <input
                       id="ab-photo"
                       type="file"
@@ -411,8 +418,8 @@ function AddBloggerForm({ user }) {
             <div className="form-header">
               <span className="form-number">02</span>
               <div>
-                <h2>Социальные сети</h2>
-                <p>Добавьте ссылки на свои аккаунты</p>
+                <h2>{t("Социальные сети")}</h2>
+                <p>{t("Добавьте ссылки на свои аккаунты")}</p>
               </div>
             </div>
 
@@ -444,18 +451,18 @@ function AddBloggerForm({ user }) {
                   type="text"
                   value={form.youtube}
                   onChange={(event) => update("youtube", event.target.value)}
-                  placeholder="Ссылка на канал"
+                  placeholder={t("Ссылка на канал")}
                 />
               </Field>
 
-              <Field id="ab-price" label="Стоимость рекламы" error={errors.price}>
+              <Field id="ab-price" label={t("Стоимость рекламы")} error={errors.price}>
                 <input
                   id="ab-price"
                   type="text"
                   inputMode="numeric"
                   value={form.price}
                   onChange={(event) => update("price", event.target.value)}
-                  placeholder="Например: от 500 сомони"
+                  placeholder={t("Например: от 500 сомони")}
                   aria-invalid={Boolean(errors.price)}
                 />
               </Field>
@@ -463,13 +470,13 @@ function AddBloggerForm({ user }) {
 
             <div className="form-divider" />
 
-            <Field id="ab-description" label="Расскажите о себе" error={errors.description}>
+            <Field id="ab-description" label={t("Расскажите о себе")} error={errors.description}>
               <textarea
                 id="ab-description"
                 rows="5"
                 value={form.description}
                 onChange={(event) => update("description", event.target.value)}
-                placeholder="Опишите себя и свой контент..."
+                placeholder={t("Опишите себя и свой контент...")}
                 aria-invalid={Boolean(errors.description)}
               />
             </Field>
@@ -481,26 +488,27 @@ function AddBloggerForm({ user }) {
                 checked={form.agree}
                 onChange={(event) => update("agree", event.target.checked)}
               />
-              <span>Я согласен(на) на публикацию этих данных в каталоге DARKOR</span>
+              <span>{t("Я согласен(на) на публикацию этих данных в каталоге DARKOR")}</span>
             </label>
-            {errors.agree && <span className="field-error">{errors.agree}</span>}
+            {errors.agree && <span className="field-error">{t(errors.agree)}</span>}
+            <PrivacyConsent text="Отправляя анкету, вы соглашаетесь с {link}." />
 
             {status === "error" && (
               <p className="form-error">
-                Не удалось отправить заявку
-                {user && account.error ? ` (${account.error})` : ""}. Попробуйте ещё раз или
-                напишите на {CONTACT.email}.
+                {!user && mail.waitSeconds > 0
+                  ? t("Подождите {n} сек. перед следующей отправкой.", { n: mail.waitSeconds })
+                  : t("Не удалось отправить заявку. Попробуйте ещё раз или напишите на {email}.", { email: CONTACT.email }) + (user && account.error ? ` (${account.error})` : "")}
               </p>
             )}
 
             <button type="submit" className="add-blogger-button" disabled={sending}>
               {sending
-                ? "Отправляем..."
+                ? t("Отправляем...")
                 : user
                   ? existing
-                    ? "Сохранить изменения"
-                    : "Отправить анкету на проверку"
-                  : "Отправить заявку"}
+                    ? t("Сохранить изменения")
+                    : t("Отправить анкету на проверку")
+                  : t("Отправить заявку")}
             </button>
           </form>
         )}
@@ -510,6 +518,7 @@ function AddBloggerForm({ user }) {
 }
 
 function AddBlogger() {
+  const t = useT();
   const { user, loading } = useAuth();
 
   // Без базы работаем как раньше: форма без аккаунта.
@@ -521,7 +530,7 @@ function AddBlogger() {
         <Hero />
         <section className="add-blogger-form-section">
           <div className="form-success card-surface">
-            <p>Загрузка...</p>
+            <p>{t("Загрузка...")}</p>
           </div>
         </section>
       </main>
@@ -534,14 +543,13 @@ function AddBlogger() {
         <Hero />
         <section className="add-blogger-form-section">
           <div className="form-success card-surface">
-            <h2>Сначала войдите</h2>
+            <h2>{t("Сначала войдите")}</h2>
             <p>
-              Чтобы добавить анкету и потом её менять, нужен аккаунт. Это быстро: почта и
-              пароль.
+              {t("Чтобы добавить анкету и потом её менять, нужен аккаунт. Это быстро: почта и пароль.")}
             </p>
             <div className="success-actions">
               <Link to="/login?next=/add-blogger" className="btn btn-primary">
-                Войти или зарегистрироваться
+                {t("Войти или зарегистрироваться")}
               </Link>
             </div>
           </div>

@@ -2,19 +2,19 @@ import { Link } from "react-router-dom";
 import { FaInstagram, FaEnvelope } from "react-icons/fa";
 import Logo from "./Logo";
 import { CONTACT } from "../config";
+import { useT } from "../i18n/lang";
 
 function Footer() {
+  const t = useT();
   return (
     <footer className="footer">
       <div className="footer-content">
         <div className="footer-brand">
-          <Link to="/" className="navbar-logo" aria-label="DARKOR — на главную">
+          <Link to="/" className="navbar-logo" aria-label={t("DARKOR — на главную")}>
             <Logo />
           </Link>
 
-          <p>
-            Платформа для поиска блогеров и размещения рекламы в Таджикистане.
-          </p>
+          <p>{t("Платформа для поиска блогеров и размещения рекламы в Таджикистане.")}</p>
 
           <div className="footer-social">
             <a
@@ -32,23 +32,24 @@ function Footer() {
         </div>
 
         <div className="footer-links">
-          <h3>Навигация</h3>
-          <Link to="/">Главная</Link>
-          <Link to="/bloggers">Блогеры</Link>
+          <h3>{t("Навигация")}</h3>
+          <Link to="/">{t("Главная")}</Link>
+          <Link to="/bloggers">{t("Блогеры")}</Link>
           <Link to="/smm">SMM</Link>
-          <Link to="/contacts">Контакты</Link>
+          <Link to="/contacts">{t("Контакты")}</Link>
         </div>
 
         <div className="footer-links">
-          <h3>Для блогеров</h3>
-          <Link to="/add-blogger">Добавить блогера</Link>
-          <Link to="/contacts">Связаться с нами</Link>
+          <h3>{t("Для блогеров")}</h3>
+          <Link to="/add-blogger">{t("Добавить блогера")}</Link>
+          <Link to="/contacts">{t("Связаться с нами")}</Link>
+          <Link to="/privacy">{t("Политика конфиденциальности")}</Link>
         </div>
       </div>
 
       <div className="footer-bottom">
-        <p>© {new Date().getFullYear()} DARKOR. Все права защищены.</p>
-        <p>Сделано в Таджикистане 🇹🇯</p>
+        <p>© {new Date().getFullYear()} DARKOR. {t("Все права защищены.")}</p>
+        <p>{t("Сделано в Таджикистане")} 🇹🇯</p>
       </div>
     </footer>
   );

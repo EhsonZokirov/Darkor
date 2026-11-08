@@ -3,6 +3,7 @@ import Hero from "../components/Hero";
 import Marquee from "../components/Marquee";
 import TopBloggers from "../components/TopBloggers";
 import Reveal from "../components/Reveal";
+import { useT } from "../i18n/lang";
 
 const STEPS = [
   {
@@ -20,6 +21,7 @@ const STEPS = [
 ];
 
 function Home() {
+  const t = useT();
   return (
     <>
       <Hero />
@@ -29,8 +31,8 @@ function Home() {
       <section className="steps section">
         <Reveal className="section-header">
           <div>
-            <span className="section-label">КАК ЭТО РАБОТАЕТ</span>
-            <h2>Три шага до рекламы</h2>
+            <span className="section-label">{t("КАК ЭТО РАБОТАЕТ")}</span>
+            <h2>{t("Три шага до рекламы")}</h2>
           </div>
         </Reveal>
 
@@ -38,8 +40,8 @@ function Home() {
           {STEPS.map((step, index) => (
             <Reveal key={step.title} delay={index * 120} className="step-card">
               <span className="step-number">0{index + 1}</span>
-              <h3>{step.title}</h3>
-              <p>{step.text}</p>
+              <h3>{t(step.title)}</h3>
+              <p>{t(step.text)}</p>
             </Reveal>
           ))}
         </div>
@@ -48,12 +50,12 @@ function Home() {
       <section className="section">
         <Reveal className="cta-banner">
           <div>
-            <h2>Вы блогер?</h2>
-            <p>Попадите в каталог DARKOR и получайте предложения от брендов.</p>
+            <h2>{t("Вы блогер?")}</h2>
+            <p>{t("Попадите в каталог DARKOR и получайте предложения от брендов.")}</p>
           </div>
 
           <Link to="/add-blogger" className="btn btn-light">
-            Добавить себя в каталог
+            {t("Добавить себя в каталог")}
           </Link>
         </Reveal>
       </section>

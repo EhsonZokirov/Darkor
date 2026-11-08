@@ -2,13 +2,13 @@ export function hasValue(value) {
   return value !== undefined && value !== null && value !== "" && value !== "—";
 }
 
-export function formatPrice(price) {
+export function formatPrice(price, t = (text) => text) {
   const number = Number(price);
-  return number > 0 ? `${number.toLocaleString("ru-RU")} сом` : "По запросу";
+  return number > 0 ? `${number.toLocaleString("ru-RU")} ${t("сом")}` : t("По запросу");
 }
 
-export function priceLabel(price) {
-  return Number(price) > 0 ? "Реклама от" : "Стоимость рекламы";
+export function priceLabel(price, t = (text) => text) {
+  return Number(price) > 0 ? t("Реклама от") : t("Стоимость рекламы");
 }
 
 // Заглушка, если у блогера нет фото.

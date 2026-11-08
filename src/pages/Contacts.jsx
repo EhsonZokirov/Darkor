@@ -1,17 +1,21 @@
 import { useState } from "react";
 import { FaInstagram, FaEnvelope, FaMapMarkerAlt } from "react-icons/fa";
 import { CONTACT } from "../config";
+import Honeypot from "../components/Honeypot";
+import PrivacyConsent from "../components/PrivacyConsent";
 import { sendMessage } from "../lib/api";
 import { useFormSubmit } from "../hooks/useFormSubmit";
 import { CONTACT_HINT, isValidContact } from "../lib/validate";
 import Reveal from "../components/Reveal";
+import { useT } from "../i18n/lang";
 
 const EMPTY = { name: "", contact: "", message: "" };
 
 function Contacts() {
+  const t = useT();
   const [form, setForm] = useState(EMPTY);
   const [errors, setErrors] = useState({});
-  const { status, via, submit, reset } = useFormSubmit();
+  const { status, via, submit, reset, trap, setTrap, waitSeconds } = useFormSubmit();
 
   function update(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -68,12 +72,11 @@ function Contacts() {
           <span className="section-label">DARKOR</span>
 
           <h1>
-            Свяжитесь <span>с нами</span>
+            {t("Свяжитесь")} <span>{t("с нами")}</span>
           </h1>
 
           <p>
-            Есть вопросы, предложения или хотите добавить блогера? Мы всегда на
-            связи.
+            {t("Есть вопросы, предложения или хотите добавить блогера? Мы всегда на связи.")}
           </p>
         </div>
       </section>
@@ -110,8 +113,8 @@ function Contacts() {
               <FaMapMarkerAlt />
             </span>
             <div>
-              <h3>Локация</h3>
-              <p>{CONTACT.location}</p>
+              <h3>{t("Локация")}</h3>
+              <p>{t(CONTACT.location)}</p>
             </div>
           </div>
         </Reveal>
@@ -120,62 +123,67 @@ function Contacts() {
           {status === "done" ? (
             <div className="form-success">
               <span className="success-icon">✓</span>
-              <h2>Спасибо!</h2>
+              <h2>{t("Спасибо!")}</h2>
               <p>
                 {via === "mailto"
-                  ? `Откроется ваша почта — нажмите «Отправить». Если письмо не открылось, напишите нам на ${CONTACT.email}.`
-                  : "Мы получили ваше сообщение и скоро ответим."}
+                  ? t("Откроется ваша почта — нажмите «Отправить». Если письмо не открылось, напишите нам на {email}.", { email: CONTACT.email })
+                  : t("Мы получили ваше сообщение и скоро ответим.")}
               </p>
               <button type="button" className="btn btn-ghost" onClick={startOver}>
-                Написать ещё
+                {t("Написать ещё")}
               </button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} noValidate>
-              <h2>Напишите нам</h2>
+              <Honeypot value={trap} onChange={setTrap} />
+              <h2>{t("Напишите нам")}</h2>
 
               <div className="form-group">
-                <label htmlFor="ct-name">Ваше имя</label>
+                <label htmlFor="ct-name">{t("Ваше имя")}</label>
                 <input
                   id="ct-name"
                   type="text"
                   value={form.name}
                   onChange={(event) => update("name", event.target.value)}
-                  placeholder="Как к вам обращаться"
+                  placeholder={t("Как к вам обращаться")}
                   aria-invalid={Boolean(errors.name)}
                 />
-                {errors.name && <span className="field-error">{errors.name}</span>}
+                {errors.name && <span className="field-error">{t(errors.name)}</span>}
               </div>
 
               <div className="form-group">
-                <label htmlFor="ct-contact">Ваш Instagram, телефон или e-mail</label>
+                <label htmlFor="ct-contact">{t("Ваш Instagram, телефон или e-mail")}</label>
                 <input
                   id="ct-contact"
                   type="text"
                   value={form.contact}
                   onChange={(event) => update("contact", event.target.value)}
-                  placeholder="@username или +992 ..."
+                  placeholder={t("@username или +992 ...")}
                   aria-invalid={Boolean(errors.contact)}
                 />
-                {errors.contact && <span className="field-error">{errors.contact}</span>}
+                {errors.contact && <span className="field-error">{t(errors.contact)}</span>}
               </div>
 
               <div className="form-group">
-                <label htmlFor="ct-message">Ваше сообщение</label>
+                <label htmlFor="ct-message">{t("Ваше сообщение")}</label>
                 <textarea
                   id="ct-message"
                   rows="5"
                   value={form.message}
                   onChange={(event) => update("message", event.target.value)}
-                  placeholder="Чем мы можем помочь?"
+                  placeholder={t("Чем мы можем помочь?")}
                   aria-invalid={Boolean(errors.message)}
                 />
-                {errors.message && <span className="field-error">{errors.message}</span>}
+                {errors.message && <span className="field-error">{t(errors.message)}</span>}
               </div>
+
+              <PrivacyConsent />
 
               {status === "error" && (
                 <p className="form-error">
-                  Не удалось отправить сообщение. Попробуйте ещё раз или напишите на {CONTACT.email}.
+                  {waitSeconds > 0
+                    ? t("Подождите {n} сек. перед следующей отправкой.", { n: waitSeconds })
+                    : t("Не удалось отправить сообщение. Попробуйте ещё раз или напишите на {email}.", { email: CONTACT.email })}
                 </p>
               )}
 
@@ -184,7 +192,7 @@ function Contacts() {
                 className="btn btn-primary btn-block"
                 disabled={status === "sending"}
               >
-                {status === "sending" ? "Отправляем..." : "Отправить сообщение"}
+                {status === "sending" ? t("Отправляем...") : t("Отправить сообщение")}
               </button>
             </form>
           )}
