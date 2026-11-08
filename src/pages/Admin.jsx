@@ -2,13 +2,17 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import BloggerEditor from "../components/BloggerEditor";
 import { useAuth } from "../context/auth";
+import SmmEditor from "../components/SmmEditor";
 import { BACKEND_ENABLED } from "../lib/supabase";
 import {
   adminDeleteBlogger,
   adminDeleteRow,
+  adminDeleteSmm,
   adminListAdRequests,
   adminListBloggers,
   adminListMessages,
+  adminListSmm,
+  adminSaveSmm,
   adminSetStatus,
 } from "../lib/api";
 import { useT } from "../i18n/lang";
@@ -26,15 +30,16 @@ const FILTERS = [
   { value: "", label: "Все" },
 ];
 
-const EMPTY = { loaded: false, error: "", bloggers: [], ads: [], messages: [] };
+const EMPTY = { loaded: false, error: "", bloggers: [], ads: [], messages: [], smm: [] };
 
 async function fetchAll() {
-  const [bloggers, ads, messages] = await Promise.all([
+  const [bloggers, ads, messages, smm] = await Promise.all([
     adminListBloggers(),
     adminListAdRequests(),
     adminListMessages(),
+    adminListSmm(),
   ]);
-  return { bloggers, ads, messages };
+  return { bloggers, ads, messages, smm };
 }
 
 const formatDate = (value) =>
@@ -77,6 +82,7 @@ function Admin() {
   const [tab, setTab] = useState("bloggers");
   const [filter, setFilter] = useState("pending");
   const [busyId, setBusyId] = useState(null);
+  const [smmEditing, setSmmEditing] = useState(null); // null | "new" | id
   const [editingId, setEditingId] = useState(null);
 
   useEffect(() => {
@@ -167,6 +173,7 @@ function Admin() {
     { value: "bloggers", label: "Блогеры", count: pendingCount },
     { value: "ads", label: "Заявки на рекламу", count: data.ads.length },
     { value: "messages", label: "Сообщения", count: data.messages.length },
+    { value: "smm", label: "SMM-специалисты", count: 0 },
   ];
 
   return (
@@ -312,7 +319,7 @@ function Admin() {
             <article className="admin-item card-surface" key={item.id}>
               <div className="admin-item-body">
                 <div className="admin-item-top">
-                  <h3>{t("Блогер:")} {item.blogger_name}</h3>
+                  <h3>{t("Кому:")} {item.blogger_name}</h3>
                   <span className="admin-date">{formatDate(item.created_at)}</span>
                 </div>
                 <p className="admin-meta">
@@ -337,6 +344,107 @@ function Admin() {
               </div>
             </article>
           ))}
+        </div>
+      )}
+
+      {data.loaded && tab === "smm" && (
+        <div className="admin-list">
+          {smmEditing === "new" ? (
+            <article className="admin-item card-surface editing">
+              <SmmEditor
+                item={null}
+                adminId={user.id}
+                onCancel={() => setSmmEditing(null)}
+                onSaved={async () => {
+                  setSmmEditing(null);
+                  await reload();
+                }}
+              />
+            </article>
+          ) : (
+            <button
+              type="button"
+              className="btn btn-primary admin-add"
+              onClick={() => setSmmEditing("new")}
+            >
+              {t("Добавить специалиста")}
+            </button>
+          )}
+
+          {data.smm.length === 0 && smmEditing !== "new" && (
+            <p className="admin-empty">{t("Специалистов пока нет.")}</p>
+          )}
+
+          {data.smm.map((item) =>
+            smmEditing === item.id ? (
+              <article className="admin-item card-surface editing" key={item.id}>
+                <SmmEditor
+                  item={item}
+                  adminId={user.id}
+                  onCancel={() => setSmmEditing(null)}
+                  onSaved={async () => {
+                    setSmmEditing(null);
+                    await reload();
+                  }}
+                />
+              </article>
+            ) : (
+              <article className="admin-item card-surface" key={item.id}>
+                {item.image_url && <img src={item.image_url} alt={item.name} />}
+
+                <div className="admin-item-body">
+                  <div className="admin-item-top">
+                    <h3>{item.name}</h3>
+                    <span className={`status-badge ${item.published ? "status-approved" : "status-pending"}`}>
+                      {item.published ? t("Показывается") : t("Скрыт")}
+                    </span>
+                  </div>
+                  <p className="admin-meta">
+                    {item.city} · {item.specialty} ·{" "}
+                    {item.price > 0 ? `${item.price} ${t("сом")}` : t("цена по запросу")}
+                  </p>
+                  <p className="admin-meta">
+                    IG: {item.instagram || "—"} · Telegram: {item.telegram || "—"} · {t("Телефон:")}{" "}
+                    {item.contact || "—"}
+                  </p>
+                  <p className="admin-text">{item.description}</p>
+
+                  <div className="admin-actions">
+                    <button
+                      type="button"
+                      className="btn btn-ghost"
+                      disabled={busyId === `smm-${item.id}`}
+                      onClick={() => setSmmEditing(item.id)}
+                    >
+                      {t("Редактировать")}
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-ghost"
+                      disabled={busyId === `smm-${item.id}`}
+                      onClick={() =>
+                        run(`smm-${item.id}`, () => adminSaveSmm(item.id, { published: !item.published }))
+                      }
+                    >
+                      {item.published ? t("Скрыть") : t("Показать")}
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-danger"
+                      disabled={busyId === `smm-${item.id}`}
+                      onClick={() => {
+                        if (window.confirm(t("Удалить специалиста «{name}» навсегда?", { name: item.name }))) {
+                          run(`smm-${item.id}`, () => adminDeleteSmm(item.id));
+                        }
+                      }}
+                    >
+                      {t("Удалить")}
+                    </button>
+                  </div>
+                </div>
+              </article>
+            )
+          )}
         </div>
       )}
 

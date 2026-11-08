@@ -173,3 +173,35 @@ export async function adminUpdateBlogger(id, fields, contact) {
     check(await supabase.from("blogger_contacts").delete().eq("blogger_id", id));
   }
 }
+
+// ---------- SMM-специалисты ----------
+
+export async function fetchSmmSpecialists() {
+  return check(
+    await supabase
+      .from("smm_specialists")
+      .select("*")
+      .eq("published", true)
+      .order("created_at", { ascending: true })
+      .order("id", { ascending: true })
+  );
+}
+
+export async function adminListSmm() {
+  return check(
+    await supabase.from("smm_specialists").select("*").order("created_at", { ascending: false })
+  );
+}
+
+// id === null — создать нового специалиста, иначе обновить существующего.
+export async function adminSaveSmm(id, fields) {
+  if (id) {
+    check(await supabase.from("smm_specialists").update(fields).eq("id", id));
+  } else {
+    check(await supabase.from("smm_specialists").insert(fields));
+  }
+}
+
+export async function adminDeleteSmm(id) {
+  check(await supabase.from("smm_specialists").delete().eq("id", id));
+}

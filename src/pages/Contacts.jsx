@@ -108,7 +108,12 @@ function Contacts() {
             </div>
           </a>
 
-          <div className="contact-card">
+          <a
+            className="contact-card"
+            href={`https://yandex.com/maps/?text=${encodeURIComponent(CONTACT.location)}`}
+            target="_blank"
+            rel="noreferrer"
+          >
             <span className="contact-icon">
               <FaMapMarkerAlt />
             </span>
@@ -116,7 +121,7 @@ function Contacts() {
               <h3>{t("Локация")}</h3>
               <p>{t(CONTACT.location)}</p>
             </div>
-          </div>
+          </a>
         </Reveal>
 
         <Reveal className="contact-form" delay={120}>

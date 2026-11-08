@@ -1,5 +1,9 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import Reveal from "../components/Reveal";
+import SmmCard from "../components/SmmCard";
+import OrderModal from "../components/OrderModal";
+import { useSmm } from "../hooks/useSmm";
 import { useT } from "../i18n/lang";
 
 const SERVICES = [
@@ -10,6 +14,10 @@ const SERVICES = [
   {
     title: "Реклама у блогеров",
     text: "Поможем подобрать блогеров для эффективной рекламной кампании.",
+  },
+  {
+    title: "SMM-специалисты",
+    text: "Подберём SMM-специалиста из Душанбе: ведение соцсетей, таргет, Reels и контент.",
   },
   {
     title: "Создание контента",
@@ -34,6 +42,8 @@ const FAQ = [
 
 function SMM() {
   const t = useT();
+  const { list, loaded } = useSmm();
+  const [selected, setSelected] = useState(null);
   return (
     <main className="smm-page">
       <section className="page-hero">
@@ -75,6 +85,38 @@ function SMM() {
         </div>
       </section>
 
+      <section className="smm-pros section" id="specialists">
+        <Reveal as="h2">{t("SMM-специалисты из Душанбе")}</Reveal>
+        <p className="smm-pros-sub">
+          {t("Помимо блогеров, мы сотрудничаем с SMM-специалистами: они ведут соцсети, запускают рекламу и делают контент для вашего бизнеса.")}
+        </p>
+
+        {loaded && list.length === 0 && (
+          <div className="no-bloggers">
+            <h3>{t("Скоро здесь появятся специалисты")}</h3>
+            <p>{t("Вы SMM-специалист из Душанбе? Напишите нам, и мы добавим вашу карточку.")}</p>
+            <Link to="/contacts" className="btn btn-primary">
+              {t("Я SMM-специалист")}
+            </Link>
+          </div>
+        )}
+
+        {list.length > 0 && (
+          <>
+            <div className="smm-pro-grid">
+              {list.map((specialist) => (
+                <SmmCard key={specialist.id} specialist={specialist} onContact={setSelected} />
+              ))}
+            </div>
+
+            <p className="smm-pros-join">
+              {t("Вы SMM-специалист из Душанбе? Напишите нам, и мы добавим вашу карточку.")}{" "}
+              <Link to="/contacts">{t("Я SMM-специалист")}</Link>
+            </p>
+          </>
+        )}
+      </section>
+
       <section className="faq section">
         <Reveal as="h2">{t("Частые вопросы")}</Reveal>
 
@@ -100,6 +142,15 @@ function SMM() {
           </Link>
         </Reveal>
       </section>
+
+      {selected && (
+        <OrderModal
+          blogger={{ id: null, name: `SMM: ${selected.name}` }}
+          title="Связаться со специалистом"
+          label="Специалист:"
+          onClose={() => setSelected(null)}
+        />
+      )}
     </main>
   );
 }
