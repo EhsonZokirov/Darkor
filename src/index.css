@@ -67,7 +67,7 @@
   --hover-bg: rgba(0, 0, 0, 0.05);
   --hover-bg-soft: rgba(0, 0, 0, 0.04);
   --badge-bg: rgba(255, 255, 255, 0.85);
-  --card-fade: rgba(255, 255, 255, 0.92);
+  --card-fade: transparent;
   --overlay: rgba(20, 20, 28, 0.45);
   --modal-shadow: 0 40px 100px -30px rgba(40, 30, 20, 0.35);
   --btn-light-bg: #17171c;
