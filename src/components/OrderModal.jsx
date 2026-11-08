@@ -9,7 +9,7 @@ import { sendAdRequest } from "../lib/api";
 import { useT } from "../i18n/lang";
 
 // Окно «Заказать рекламу у блогера».
-function OrderModal({ blogger, onClose }) {
+function OrderModal({ blogger, onClose, title = "Заказать рекламу", label = "Блогер:" }) {
   const t = useT();
   const [form, setForm] = useState({ name: "", contact: "", message: "" });
   const [errors, setErrors] = useState({});
@@ -49,7 +49,7 @@ function OrderModal({ blogger, onClose }) {
     if (Object.keys(next).length > 0) return;
 
     await submit(
-      `Заказ рекламы: ${blogger.name}`,
+      `${title}: ${blogger.name}`,
       {
         Блогер: blogger.name,
         Имя: form.name.trim(),
@@ -97,9 +97,9 @@ function OrderModal({ blogger, onClose }) {
         ) : (
           <form onSubmit={handleSubmit} noValidate>
             <Honeypot value={trap} onChange={setTrap} />
-            <h2 id="order-title">{t("Заказать рекламу")}</h2>
+            <h2 id="order-title">{t(title)}</h2>
             <p className="modal-sub">
-              {t("Блогер:")} <strong>{blogger.name}</strong>
+              {t(label)} <strong>{blogger.name}</strong>
             </p>
 
             <div className="form-group">

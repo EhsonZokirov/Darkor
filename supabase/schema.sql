@@ -274,7 +274,45 @@ create trigger messages_limit_trg
   for each row execute function public.limit_submissions();
 
 
--- ---------- 8. Назначить администратора ----------
+-- ---------- 8. SMM-специалисты ----------
+-- Карточки SMM-специалистов для раздела «SMM». Добавляет и правит только администратор
+-- (в админ-панели). Контакты здесь публичные: специалисты хотят получать заказы.
+
+create table if not exists public.smm_specialists (
+  id          bigint generated always as identity primary key,
+  name        text not null check (char_length(name) between 2 and 80),
+  city        text not null default 'Душанбе' check (char_length(city) between 2 and 60),
+  specialty   text not null check (char_length(specialty) between 2 and 120),
+  services    text[] not null default '{}',
+  price       integer not null default 0 check (price >= 0),
+  instagram   text not null default '' check (char_length(instagram) <= 200),
+  telegram    text not null default '' check (char_length(telegram) <= 200),
+  contact     text not null default '' check (char_length(contact) <= 200),
+  description text not null check (char_length(description) between 10 and 2000),
+  image_url   text,
+  published   boolean not null default true,
+  created_at  timestamptz not null default now()
+);
+
+alter table public.smm_specialists enable row level security;
+
+drop policy if exists "smm: read" on public.smm_specialists;
+create policy "smm: read" on public.smm_specialists
+  for select using (published or public.is_admin());
+
+drop policy if exists "smm: admin insert" on public.smm_specialists;
+create policy "smm: admin insert" on public.smm_specialists
+  for insert with check (public.is_admin());
+
+drop policy if exists "smm: admin update" on public.smm_specialists;
+create policy "smm: admin update" on public.smm_specialists
+  for update using (public.is_admin()) with check (public.is_admin());
+
+drop policy if exists "smm: admin delete" on public.smm_specialists;
+create policy "smm: admin delete" on public.smm_specialists
+  for delete using (public.is_admin());
+
+-- ---------- 9. Назначить администратора ----------
 -- Сначала зарегистрируйтесь на сайте, затем выполните (подставьте свою почту):
 --
 --   update public.profiles
