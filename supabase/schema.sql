@@ -236,7 +236,45 @@ create policy "avatars: delete own" on storage.objects
   using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
 
 
--- ---------- 7. Назначить администратора ----------
+-- ---------- 7. Защита от потока заявок ----------
+-- Если за последние 10 минут пришло 30 и больше заявок (или сообщений),
+-- новые временно отклоняются. Это защищает админку от бота-спамера.
+-- Лимит можно изменить: число 30 ниже.
+
+create or replace function public.limit_submissions()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  recent integer;
+begin
+  execute format(
+    'select count(*) from public.%I where created_at > now() - interval ''10 minutes''',
+    tg_table_name
+  ) into recent;
+
+  if recent >= 30 then
+    raise exception 'Слишком много заявок, попробуйте позже' using errcode = 'P0001';
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists ad_requests_limit_trg on public.ad_requests;
+create trigger ad_requests_limit_trg
+  before insert on public.ad_requests
+  for each row execute function public.limit_submissions();
+
+drop trigger if exists messages_limit_trg on public.messages;
+create trigger messages_limit_trg
+  before insert on public.messages
+  for each row execute function public.limit_submissions();
+
+
+-- ---------- 8. Назначить администратора ----------
 -- Сначала зарегистрируйтесь на сайте, затем выполните (подставьте свою почту):
 --
 --   update public.profiles

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import Reveal from "../components/Reveal";
+import { useT } from "../i18n/lang";
 
 const SERVICES = [
   {
@@ -32,6 +33,7 @@ const FAQ = [
 ];
 
 function SMM() {
+  const t = useT();
   return (
     <main className="smm-page">
       <section className="page-hero">
@@ -44,44 +46,43 @@ function SMM() {
           <span className="section-label">DARKOR</span>
 
           <h1>
-            Продвигайте свой бизнес
+            {t("Продвигайте свой бизнес")}
             <br />
-            <span>с помощью блогеров</span>
+            <span>{t("с помощью блогеров")}</span>
           </h1>
 
           <p>
-            Найдите подходящего автора для рекламы, продвижения бренда и
-            создания контента.
+            {t("Найдите подходящего автора для рекламы, продвижения бренда и создания контента.")}
           </p>
 
           <Link to="/contacts" className="btn btn-primary">
-            Обсудить сотрудничество
+            {t("Обсудить сотрудничество")}
           </Link>
         </div>
       </section>
 
       <section className="smm-services section">
-        <Reveal as="h2">Что мы предлагаем</Reveal>
+        <Reveal as="h2">{t("Что мы предлагаем")}</Reveal>
 
         <div className="smm-grid">
           {SERVICES.map((service, index) => (
             <Reveal key={service.title} delay={index * 120} className="smm-card">
               <span>0{index + 1}</span>
-              <h3>{service.title}</h3>
-              <p>{service.text}</p>
+              <h3>{t(service.title)}</h3>
+              <p>{t(service.text)}</p>
             </Reveal>
           ))}
         </div>
       </section>
 
       <section className="faq section">
-        <Reveal as="h2">Частые вопросы</Reveal>
+        <Reveal as="h2">{t("Частые вопросы")}</Reveal>
 
         <Reveal className="faq-list">
           {FAQ.map((item) => (
             <details key={item.q}>
-              <summary>{item.q}</summary>
-              <p>{item.a}</p>
+              <summary>{t(item.q)}</summary>
+              <p>{t(item.a)}</p>
             </details>
           ))}
         </Reveal>
@@ -90,14 +91,12 @@ function SMM() {
       <section className="section">
         <Reveal className="cta-banner">
           <div>
-            <h2>Хотите продвинуть свой бизнес?</h2>
-            <p>
-              Свяжитесь с нами, и мы поможем подобрать подходящее решение.
-            </p>
+            <h2>{t("Хотите продвинуть свой бизнес?")}</h2>
+            <p>{t("Свяжитесь с нами, и мы поможем подобрать подходящее решение.")}</p>
           </div>
 
           <Link to="/contacts" className="btn btn-light">
-            Связаться с нами
+            {t("Связаться с нами")}
           </Link>
         </Reveal>
       </section>

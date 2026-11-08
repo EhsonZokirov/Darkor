@@ -162,3 +162,14 @@ export async function adminListMessages() {
 export async function adminDeleteRow(table, id) {
   check(await supabase.from(table).delete().eq("id", id));
 }
+
+// Правка анкеты администратором. Статус анкеты при этом не меняется.
+export async function adminUpdateBlogger(id, fields, contact) {
+  check(await supabase.from("bloggers").update(fields).eq("id", id));
+
+  if (contact) {
+    check(await supabase.from("blogger_contacts").upsert({ blogger_id: id, contact }));
+  } else {
+    check(await supabase.from("blogger_contacts").delete().eq("blogger_id", id));
+  }
+}

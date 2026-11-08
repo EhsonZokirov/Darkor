@@ -65,6 +65,20 @@ function AuthProvider({ children }) {
       async signOut() {
         await supabase.auth.signOut();
       },
+
+      // Отправляет письмо со ссылкой на страницу /reset-password.
+      async resetPassword(email) {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (error) throw new Error(error.message);
+      },
+
+      // Меняет пароль текущего пользователя (после перехода по ссылке из письма).
+      async updatePassword(password) {
+        const { error } = await supabase.auth.updateUser({ password });
+        if (error) throw new Error(error.message);
+      },
     }),
     [user, role, loading]
   );

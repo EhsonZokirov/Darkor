@@ -4,8 +4,10 @@ import Reveal from "./Reveal";
 import Search from "./Search";
 import Filter from "./Filter";
 import { useBloggers } from "../hooks/useBloggers";
+import { useT } from "../i18n/lang";
 
 function Bloggers() {
+  const t = useT();
   const bloggersData = useBloggers();
   const categories = useMemo(
     () => [...new Set(bloggersData.map((blogger) => blogger.category))],
@@ -22,7 +24,7 @@ function Bloggers() {
     return bloggersData.filter((blogger) => {
       const matchesText =
         text === "" ||
-        [blogger.name, blogger.category, blogger.city, ...(blogger.tags || [])]
+        [blogger.name, blogger.category, t(blogger.category), blogger.city, ...(blogger.tags || [])]
           .filter(Boolean)
           .some((value) => String(value).toLowerCase().includes(text));
 
@@ -32,7 +34,7 @@ function Bloggers() {
         (gender === "" || blogger.gender === gender)
       );
     });
-  }, [bloggersData, query, category, gender]);
+  }, [bloggersData, query, category, gender, t]);
 
   const hasFilters = query !== "" || category !== "" || gender !== "";
 
@@ -54,14 +56,13 @@ function Bloggers() {
           <span className="section-label">DARKOR / CREATORS</span>
 
           <h1>
-            Найди блогера
+            {t("Найди блогера")}
             <br />
-            <span>для своей рекламы</span>
+            <span>{t("для своей рекламы")}</span>
           </h1>
 
           <p>
-            Исследуй блогеров Таджикистана, сравнивай аудиторию и находи
-            подходящего автора для продвижения своего бренда.
+            {t("Исследуй блогеров Таджикистана, сравнивай аудиторию и находи подходящего автора для продвижения своего бренда.")}
           </p>
         </div>
       </section>
@@ -69,12 +70,12 @@ function Bloggers() {
       <section className="bloggers section">
         <div className="bloggers-section-header">
           <div>
-            <span className="section-label">КАТАЛОГ БЛОГЕРОВ</span>
-            <h2>Все блогеры</h2>
+            <span className="section-label">{t("КАТАЛОГ БЛОГЕРОВ")}</span>
+            <h2>{t("Все блогеры")}</h2>
           </div>
 
           <span className="bloggers-count" aria-live="polite">
-            Найдено: {filtered.length}
+            {t("Найдено: {count}", { count: filtered.length })}
           </span>
         </div>
 
@@ -90,7 +91,7 @@ function Bloggers() {
 
         {hasFilters && (
           <button type="button" className="reset-button" onClick={resetAll}>
-            Сбросить поиск и фильтры
+            {t("Сбросить поиск и фильтры")}
           </button>
         )}
 
@@ -103,10 +104,10 @@ function Bloggers() {
             ))
           ) : (
             <div className="no-bloggers">
-              <h3>Блогеры не найдены</h3>
-              <p>Попробуйте изменить поисковый запрос или фильтры.</p>
+              <h3>{t("Блогеры не найдены")}</h3>
+              <p>{t("Попробуйте изменить поисковый запрос или фильтры.")}</p>
               <button type="button" className="btn btn-primary" onClick={resetAll}>
-                Показать всех
+                {t("Показать всех")}
               </button>
             </div>
           )}

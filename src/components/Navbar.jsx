@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import Logo from "./Logo";
 import { useAuth } from "../context/auth";
+import { useLang } from "../i18n/lang";
 import { BACKEND_ENABLED } from "../lib/supabase";
 
 const LINKS = [
@@ -11,6 +12,7 @@ const LINKS = [
 ];
 
 function Navbar() {
+  const { lang, setLang, t } = useLang();
   const { user, role } = useAuth();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(() => window.scrollY > 10);
@@ -49,12 +51,12 @@ function Navbar() {
           to="/"
           className="navbar-logo"
           onClick={closeMenu}
-          aria-label="DARKOR — на главную"
+          aria-label={t("DARKOR — на главную")}
         >
           <Logo />
         </Link>
 
-        <nav className="nav-links" id="main-nav" aria-label="Основное меню">
+        <nav className="nav-links" id="main-nav" aria-label={t("Основное меню")}>
           {LINKS.map((link) => (
             <NavLink
               key={link.to}
@@ -62,7 +64,7 @@ function Navbar() {
               onClick={closeMenu}
               className={({ isActive }) => (isActive ? "active" : "")}
             >
-              {link.label}
+              {t(link.label)}
             </NavLink>
           ))}
 
@@ -72,7 +74,7 @@ function Navbar() {
               onClick={closeMenu}
               className={({ isActive }) => (isActive ? "active" : "")}
             >
-              Админ
+              {t("Админ")}
             </NavLink>
           )}
 
@@ -82,7 +84,7 @@ function Navbar() {
               onClick={closeMenu}
               className={({ isActive }) => (isActive ? "active" : "")}
             >
-              {user ? "Кабинет" : "Войти"}
+              {user ? t("Кабинет") : t("Войти")}
             </NavLink>
           )}
 
@@ -91,8 +93,26 @@ function Navbar() {
             className="btn btn-primary nav-cta"
             onClick={closeMenu}
           >
-            Добавить блогера
+            {t("Добавить блогера")}
           </Link>
+
+          <div className="lang-switch" role="group" aria-label={t("Язык")}>
+            {[
+              ["ru", "РУ"],
+              ["tg", "ТҶ"],
+            ].map(([code, label]) => (
+              <button
+                key={code}
+                type="button"
+                className={lang === code ? "active" : ""}
+                aria-pressed={lang === code}
+                onClick={() => setLang(code)}
+                title={code === "ru" ? "Русский" : "Тоҷикӣ"}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </nav>
 
         <button
@@ -101,7 +121,7 @@ function Navbar() {
           onClick={() => setOpen((value) => !value)}
           aria-expanded={open}
           aria-controls="main-nav"
-          aria-label={open ? "Закрыть меню" : "Открыть меню"}
+          aria-label={open ? t("Закрыть меню") : t("Открыть меню")}
         >
           <span />
           <span />
