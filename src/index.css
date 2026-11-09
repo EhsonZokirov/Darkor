@@ -2676,8 +2676,9 @@ a.sponsor-banner:hover {
   z-index: 2;
   padding: 4px 10px;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(6px);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -2722,37 +2723,279 @@ a.sponsor-banner:hover {
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.6);
 }
-.sponsor-art {
+.sponsor-logo-chip {
+  display: inline-flex;
+  margin-bottom: 16px;
+  padding: 8px 14px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+}
+.sponsor-logo-chip .sponsor-logo {
+  margin: 0;
+  height: 54px;
+  width: auto;
+}
+.sponsor-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.sponsor-features li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  font-size: 13px;
+  font-weight: 600;
+  backdrop-filter: blur(6px);
+}
+.sponsor-features svg {
+  flex: none;
+  font-size: 16px;
+}
+.sponsor-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 22px;
+  padding: 13px 24px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff3b3b, #c4101f);
+  box-shadow: 0 10px 28px rgba(255, 40, 60, 0.35);
+  font-weight: 700;
+}
+.sponsor-button + .sponsor-partner {
+  display: block;
+}
+.sponsor-photo {
   position: absolute;
-  right: clamp(8px, 6vw, 80px);
-  bottom: -30px;
-  width: clamp(170px, 26vw, 290px);
-  aspect-ratio: 1;
-  transform: rotate(10deg);
+  right: 0;
+  bottom: 0;
+  height: 112%;
+  width: auto;
+  max-width: 62%;
+  object-fit: cover;
+  object-position: left center;
   pointer-events: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 34%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 34%);
 }
-.sponsor-art svg {
-  width: 100%;
-  height: 100%;
+.sponsor-section.is-compact {
+  padding-top: clamp(24px, 4vw, 48px);
+  padding-bottom: clamp(32px, 5vw, 56px);
 }
-.sponsor-bubble {
-  position: absolute;
-  bottom: 20%;
-  width: var(--s);
-  height: var(--s);
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.45);
-  animation: sponsor-rise 5s ease-in infinite;
-  animation-delay: var(--d);
+.sponsor-section.is-compact .sponsor-banner {
+  min-height: 0;
+  padding: clamp(22px, 3.4vw, 34px) clamp(24px, 4vw, 44px);
+  border-radius: 24px;
 }
-@keyframes sponsor-rise {
-  from { transform: translateY(0); opacity: 0.8; }
-  to { transform: translateY(-150px); opacity: 0; }
+.sponsor-section.is-compact .sponsor-copy {
+  max-width: 460px;
 }
-@media (prefers-reduced-motion: reduce) {
-  .sponsor-bubble { animation: none; opacity: 0.4; }
+.sponsor-section.is-compact .sponsor-logo-chip {
+  margin-bottom: 10px;
+}
+.sponsor-section.is-compact .sponsor-logo-chip .sponsor-logo {
+  height: 38px;
+}
+.sponsor-section.is-compact h2 {
+  font-size: clamp(19px, 2.6vw, 26px);
+}
+.sponsor-section.is-compact .sponsor-photo {
+  height: 150%;
+  max-width: 48%;
+}
+.sponsor-section.is-compact .sponsor-partner {
+  margin-top: 12px;
+}
+@media (max-width: 900px) {
+  .sponsor-photo { max-width: 52%; opacity: 0.9; }
 }
 @media (max-width: 640px) {
-  .sponsor-banner { min-height: 0; padding-bottom: 150px; }
-  .sponsor-art { right: -10px; bottom: -40px; width: 190px; }
+  .sponsor-banner { min-height: 0; padding-bottom: 0; }
+  .sponsor-copy { max-width: none; padding-bottom: 24px; }
+  .sponsor-photo {
+    position: relative;
+    display: block;
+    width: calc(100% + 2 * clamp(28px, 5vw, 56px));
+    max-width: none;
+    height: 236px;
+    margin: 0 calc(-1 * clamp(28px, 5vw, 56px)) -16px;
+    transform-origin: 50% 100%;
+    object-position: center 55%;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 40%);
+    mask-image: linear-gradient(180deg, transparent 0, #000 40%);
+  }
+  .sponsor-section.is-compact .sponsor-photo {
+    height: 166px;
+    max-width: none;
+    width: calc(100% + 2 * 24px);
+    margin: 0 -24px -16px;
+  }
+  .sponsor-section.is-compact .sponsor-banner { padding: 22px 24px 0; }
+}
+
+/* ---------- Анимации рекламного баннера ---------- */
+
+/* медленно «дышащее» свечение на фоне */
+.sponsor-banner::before {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background:
+    radial-gradient(380px 260px at 70% 30%, rgba(255, 70, 80, 0.35), transparent 70%),
+    radial-gradient(340px 240px at 20% 80%, rgba(60, 110, 255, 0.28), transparent 70%);
+  animation: sponsor-drift 9s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+/* блик, пробегающий по баннеру */
+.sponsor-banner::after {
+  content: "";
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: -40%;
+  width: 28%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+  transform: skewX(-18deg);
+  animation: sponsor-shine 6.5s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+.sponsor-copy,
+.sponsor-photo,
+.sponsor-bubbles {
+  z-index: 1;
+}
+.sponsor-banner:hover .sponsor-photo {
+  filter: saturate(1.15) brightness(1.06);
+}
+.sponsor-banner:hover {
+  transform: translateY(-3px);
+}
+/* банки плавно «парят» */
+.sponsor-photo {
+  transform-origin: 60% 80%;
+  animation: sponsor-float 6s ease-in-out infinite;
+  transition: filter 0.4s var(--ease);
+}
+/* логотип слегка пульсирует */
+.sponsor-logo-chip {
+  animation: sponsor-pulse 3.2s ease-in-out infinite;
+}
+/* чипы и текст появляются по очереди */
+.sponsor-copy > * {
+  animation: sponsor-rise-in 0.7s var(--ease) both;
+}
+.sponsor-copy > :nth-child(1) { animation-delay: 0.05s; }
+.sponsor-copy > :nth-child(2) { animation-delay: 0.15s; }
+.sponsor-copy > :nth-child(3) { animation-delay: 0.25s; }
+.sponsor-copy > :nth-child(4) { animation-delay: 0.35s; }
+.sponsor-copy > :nth-child(5) { animation-delay: 0.45s; }
+.sponsor-copy > :nth-child(6) { animation-delay: 0.55s; }
+.sponsor-features li {
+  transition: transform 0.25s var(--ease), background 0.25s var(--ease);
+}
+.sponsor-features li:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.18);
+}
+.sponsor-features svg {
+  animation: sponsor-wiggle 4s ease-in-out infinite;
+}
+.sponsor-features li:nth-child(2) svg { animation-delay: 0.6s; }
+.sponsor-features li:nth-child(3) svg { animation-delay: 1.2s; }
+.sponsor-button {
+  animation: sponsor-glow 2.4s ease-in-out infinite;
+}
+.sponsor-button svg {
+  transition: transform 0.25s var(--ease);
+}
+.sponsor-banner:hover .sponsor-button svg {
+  transform: translateX(5px);
+}
+.sponsor-tag {
+  animation: sponsor-pulse 3.2s ease-in-out infinite 0.8s;
+}
+/* пузырьки газировки */
+.sponsor-bubbles {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 55%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+.sponsor-bubbles i {
+  position: absolute;
+  bottom: -14px;
+  left: calc(8% + var(--i) * 13%);
+  width: calc(5px + (var(--i) % 3) * 4px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.45);
+  animation: sponsor-bubble calc(4.5s + var(--i) * 0.55s) ease-in infinite;
+  animation-delay: calc(var(--i) * -0.9s);
+}
+
+@keyframes sponsor-drift {
+  from { transform: translate3d(-4%, -3%, 0) scale(1); }
+  to { transform: translate3d(5%, 4%, 0) scale(1.12); }
+}
+@keyframes sponsor-shine {
+  0%, 55% { left: -40%; }
+  100% { left: 140%; }
+}
+@keyframes sponsor-float {
+  0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+  50% { transform: translateY(-10px) rotate(-0.8deg) scale(1.025); }
+}
+@keyframes sponsor-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.045); }
+}
+@keyframes sponsor-rise-in {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes sponsor-wiggle {
+  0%, 85%, 100% { transform: rotate(0); }
+  90% { transform: rotate(-14deg) scale(1.15); }
+  95% { transform: rotate(10deg) scale(1.15); }
+}
+@keyframes sponsor-glow {
+  0%, 100% { box-shadow: 0 10px 28px rgba(255, 40, 60, 0.35); }
+  50% { box-shadow: 0 10px 40px rgba(255, 60, 80, 0.7); }
+}
+@keyframes sponsor-bubble {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  12% { opacity: 0.9; }
+  100% { transform: translateY(-260px) translateX(14px); opacity: 0; }
+}
+@media (max-width: 640px) {
+  .sponsor-bubbles { width: 100%; height: 230px; }
+  .sponsor-section.is-compact .sponsor-bubbles { height: 160px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sponsor-banner::before,
+  .sponsor-banner::after,
+  .sponsor-photo,
+  .sponsor-logo-chip,
+  .sponsor-tag,
+  .sponsor-copy > *,
+  .sponsor-features svg,
+  .sponsor-button,
+  .sponsor-bubbles i {
+    animation: none !important;
+  }
+  .sponsor-bubbles { display: none; }
 }
