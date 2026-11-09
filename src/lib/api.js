@@ -1,6 +1,6 @@
 // Все обращения к базе данных собраны здесь, чтобы страницы не знали про Supabase.
 import { supabase } from "./supabase";
-import { PLACEHOLDER_IMAGE } from "./format";
+import { PLACEHOLDER_IMAGE, followersText } from "./format";
 
 function check({ data, error }) {
   if (error) throw new Error(error.message);
@@ -15,9 +15,9 @@ function toBlogger(row) {
     city: row.city,
     gender: row.gender,
     category: row.category,
-    instagram: row.instagram || "—",
-    tiktok: row.tiktok || "—",
-    youtube: row.youtube || "—",
+    instagram: followersText(row.instagram) || "—",
+    tiktok: followersText(row.tiktok) || "—",
+    youtube: followersText(row.youtube) || "—",
     price: row.price || 0,
     image: row.image_url || PLACEHOLDER_IMAGE,
     description: row.description,

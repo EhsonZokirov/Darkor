@@ -21,3 +21,25 @@ export const PLACEHOLDER_IMAGE =
       `<path d="M60 500c0-95 62-150 140-150s140 55 140 150z" fill="#23232d"/>` +
       `</svg>`
   );
+
+// ---------- Защита от ссылок в анкетах ----------
+// Мы не хотим, чтобы посетители уходили на чужие страницы, поэтому в анкетах
+// просим только количество подписчиков, без ссылок и никнеймов.
+
+const LINK_RE =
+  /(https?:\/\/|www\.|\b[a-z0-9-]+\.(com|ru|tj|me|org|net|io|uz|kz|ly|be|gl|info|app)\b|\bt\.me\b)/i;
+
+// Есть ли в тексте ссылка.
+export function hasLink(text) {
+  return LINK_RE.test(text || "");
+}
+
+// Похоже ли значение на ссылку или никнейм (а не на число подписчиков).
+export function looksLikeAccount(text) {
+  return hasLink(text) || /[@/\\]/.test(text || "");
+}
+
+// Подписчики из базы: если там по старой анкете остался никнейм или ссылка, не показываем.
+export function followersText(value) {
+  return looksLikeAccount(value) ? "" : value || "";
+}

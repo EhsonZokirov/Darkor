@@ -122,7 +122,7 @@ function BloggerProfile() {
         </Reveal>
 
         <Reveal className="profile-section">
-          <h2>{t("Социальные сети")}</h2>
+          <h2>{t("Аудитория в соцсетях")}</h2>
 
           <div className="profile-stats">
             <div className="profile-stat">
