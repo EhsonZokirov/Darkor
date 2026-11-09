@@ -29,16 +29,18 @@ export const CATEGORIES = [
 
 export const GENDERS = ["Мужчина", "Женщина"];
 
-// Платная реклама на главной странице.
+// Платная реклама партнёра: показывается на всех страницах (кроме админки).
 // Чтобы УБРАТЬ баннер — поставьте enabled: false (или удалите блок целиком).
-// Логотип партнёра: положите файл в папку public/sponsor/ (например logo.png)
-// и впишите путь в logo: "/sponsor/logo.png". Пока logo пустой — показывается название.
+// Логотип лежит в public/sponsor/logo.png, фото банок — public/sponsor/cans.jpg.
 // Если нужна ссылка по клику — впишите её в link (например "https://...").
 export const SPONSOR = {
   enabled: true,
   name: "RC Cola",
-  logo: "", // например "/sponsor/logo.png"
+  logo: "/sponsor/logo.png",
+  image: "/sponsor/cans.jpg",
   headline: "Освежись по-настоящему",
   text: "Любимый вкус колы — со льдом, в компании и в любой момент дня.",
+  features: ["Яркий вкус", "Освежает и бодрит", "Удобный формат 330 мл"],
+  button: "Попробовать RC Cola", // кнопка показывается только если задан link
   link: "",
 };
