@@ -9,6 +9,7 @@ import { CONTACT_HINT, isValidContact } from "../lib/validate";
 import { BACKEND_ENABLED } from "../lib/supabase";
 import { fetchMyBlogger, saveMyBlogger, uploadAvatar } from "../lib/api";
 import { useT } from "../i18n/lang";
+import { hasLink, looksLikeAccount } from "../lib/format";
 
 const EMPTY = {
   name: "",
@@ -163,7 +164,15 @@ function AddBloggerForm({ user }) {
     if (!isValidContact(form.contact)) next.contact = CONTACT_HINT;
 
     if (!form.instagram.trim() && !form.tiktok.trim() && !form.youtube.trim()) {
-      next.instagram = t("Добавьте хотя бы одну социальную сеть");
+      next.instagram = t("Укажите количество подписчиков хотя бы в одной сети");
+    }
+    for (const key of ["instagram", "tiktok", "youtube"]) {
+      const value = form[key].trim();
+      if (value && looksLikeAccount(value)) {
+        next[key] = t("Укажите только количество подписчиков, без ссылок и @");
+      } else if (value.length > 30) {
+        next[key] = t("Не длиннее 30 символов");
+      }
     }
 
     if (form.price.trim() && !/\d/.test(form.price)) {
@@ -172,6 +181,8 @@ function AddBloggerForm({ user }) {
 
     if (form.description.trim().length < 10) {
       next.description = t("Расскажите о себе хотя бы в одном-двух предложениях");
+    } else if (hasLink(form.description)) {
+      next.description = t("В описании нельзя оставлять ссылки");
     }
 
     if (!form.agree) next.agree = t("Нужно ваше согласие на публикацию");
@@ -418,40 +429,40 @@ function AddBloggerForm({ user }) {
             <div className="form-header">
               <span className="form-number">02</span>
               <div>
-                <h2>{t("Социальные сети")}</h2>
-                <p>{t("Добавьте ссылки на свои аккаунты")}</p>
+                <h2>{t("Ваша аудитория")}</h2>
+                <p>{t("Укажите, сколько у вас подписчиков")}</p>
               </div>
             </div>
 
             <div className="form-grid">
-              <Field id="ab-instagram" label="Instagram" error={errors.instagram}>
+              <Field id="ab-instagram" label={t("Подписчики в Instagram")} error={errors.instagram}>
                 <input
                   id="ab-instagram"
                   type="text"
                   value={form.instagram}
                   onChange={(event) => update("instagram", event.target.value)}
-                  placeholder="@username"
+                  placeholder={t("Например: 12 тыс.")}
                   aria-invalid={Boolean(errors.instagram)}
                 />
               </Field>
 
-              <Field id="ab-tiktok" label="TikTok">
+              <Field id="ab-tiktok" label={t("Подписчики в TikTok")} error={errors.tiktok}>
                 <input
                   id="ab-tiktok"
                   type="text"
                   value={form.tiktok}
                   onChange={(event) => update("tiktok", event.target.value)}
-                  placeholder="@username"
+                  placeholder={t("Например: 12 тыс.")}
                 />
               </Field>
 
-              <Field id="ab-youtube" label="YouTube">
+              <Field id="ab-youtube" label={t("Подписчики в YouTube")} error={errors.youtube}>
                 <input
                   id="ab-youtube"
                   type="text"
                   value={form.youtube}
                   onChange={(event) => update("youtube", event.target.value)}
-                  placeholder={t("Ссылка на канал")}
+                  placeholder={t("Например: 12 тыс.")}
                 />
               </Field>
 

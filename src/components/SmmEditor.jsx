@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { adminSaveSmm, uploadAvatar } from "../lib/api";
 import { useT } from "../i18n/lang";
+import { hasLink } from "../lib/format";
 
 const MAX_PHOTO_BYTES = 3 * 1024 * 1024;
 const PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -83,6 +84,9 @@ function SmmEditor({ item, adminId, onCancel, onSaved }) {
     if (length(form.description) < 10 || length(form.description) > 2000) {
       found.description = t("От 10 до 2000 символов");
     }
+    if (!found.description && hasLink(form.description)) {
+      found.description = t("В описании нельзя оставлять ссылки");
+    }
     if (form.price.trim() && !/^\d+$/.test(form.price.trim())) found.price = t("Только цифры");
     for (const key of ["instagram", "telegram", "contact"]) {
       if (length(form[key]) > 200) found[key] = t("Не длиннее 200 символов");
@@ -157,7 +161,7 @@ function SmmEditor({ item, adminId, onCancel, onSaved }) {
           />
         </Field>
 
-        <Field id="sm-instagram" label="Instagram" error={errors.instagram}>
+        <Field id="sm-instagram" label={t("Instagram (для вас, не показывается на сайте)")} error={errors.instagram}>
           <input
             id="sm-instagram"
             value={form.instagram}
@@ -166,7 +170,7 @@ function SmmEditor({ item, adminId, onCancel, onSaved }) {
           />
         </Field>
 
-        <Field id="sm-telegram" label="Telegram" error={errors.telegram}>
+        <Field id="sm-telegram" label={t("Telegram (для вас, не показывается на сайте)")} error={errors.telegram}>
           <input
             id="sm-telegram"
             value={form.telegram}

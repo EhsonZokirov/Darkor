@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { CATEGORIES, GENDERS } from "../config";
 import { adminUpdateBlogger, uploadAvatar } from "../lib/api";
 import { useT } from "../i18n/lang";
+import { hasLink, looksLikeAccount } from "../lib/format";
 
 const MAX_PHOTO_BYTES = 3 * 1024 * 1024;
 const PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -98,7 +99,14 @@ function BloggerEditor({ item, adminId, onCancel, onSaved }) {
       found.price = t("Только цифры");
     }
     for (const key of ["instagram", "tiktok", "youtube"]) {
-      if (length(form[key]) > 200) found[key] = t("Не длиннее 200 символов");
+      if (form[key].trim() && looksLikeAccount(form[key])) {
+        found[key] = t("Укажите только количество подписчиков, без ссылок и @");
+      } else if (length(form[key]) > 30) {
+        found[key] = t("Не длиннее 30 символов");
+      }
+    }
+    if (found.description === undefined && hasLink(form.description)) {
+      found.description = t("В описании нельзя оставлять ссылки");
     }
 
     return found;
@@ -213,30 +221,30 @@ function BloggerEditor({ item, adminId, onCancel, onSaved }) {
           />
         </Field>
 
-        <Field id="ed-instagram" label="Instagram" error={errors.instagram}>
+        <Field id="ed-instagram" label={t("Подписчики в Instagram")} error={errors.instagram}>
           <input
             id="ed-instagram"
             value={form.instagram}
             onChange={(event) => update("instagram", event.target.value)}
-            placeholder="@username"
+            placeholder={t("Например: 12 тыс.")}
           />
         </Field>
 
-        <Field id="ed-tiktok" label="TikTok" error={errors.tiktok}>
+        <Field id="ed-tiktok" label={t("Подписчики в TikTok")} error={errors.tiktok}>
           <input
             id="ed-tiktok"
             value={form.tiktok}
             onChange={(event) => update("tiktok", event.target.value)}
-            placeholder="@username"
+            placeholder={t("Например: 12 тыс.")}
           />
         </Field>
 
-        <Field id="ed-youtube" label="YouTube" error={errors.youtube}>
+        <Field id="ed-youtube" label={t("Подписчики в YouTube")} error={errors.youtube}>
           <input
             id="ed-youtube"
             value={form.youtube}
             onChange={(event) => update("youtube", event.target.value)}
-            placeholder={t("Ссылка на канал")}
+            placeholder={t("Например: 12 тыс.")}
           />
         </Field>
 
