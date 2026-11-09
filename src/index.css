@@ -35,6 +35,8 @@
   --warn: #ffb347;
   --danger: #ff6b77;
   --orb-opacity: 1;
+  --ornament: rgba(255, 130, 90, 0.2);
+  --bloom: rgba(255, 110, 80, 0.12);
   color-scheme: dark;
 
   --radius: 20px;
@@ -76,6 +78,8 @@
   --warn: #b26a00;
   --danger: #c9283a;
   --orb-opacity: 0.45;
+  --ornament: rgba(190, 70, 50, 0.1);
+  --bloom: rgba(200, 80, 60, 0.09);
   color-scheme: light;
 }
 
@@ -3025,4 +3029,63 @@ a.sponsor-banner:hover {
     animation: none !important;
   }
   .sponsor-bubbles { display: none; }
+}
+
+/* =========================================================
+   Фоновый орнамент (таджикский гирех: звёзды и цветы)
+========================================================= */
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-color: var(--ornament);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22 viewBox=%220 0 120 120%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.3%22%3E%3Crect x=%2230%22 y=%2230%22 width=%2260%22 height=%2260%22/%3E%3Crect x=%2230%22 y=%2230%22 width=%2260%22 height=%2260%22 transform=%22rotate%2845 60 60%29%22/%3E%3Ccircle cx=%2260%22 cy=%2260%22 r=%2221%22/%3E%3Cellipse cx=%2260%22 cy=%2251%22 rx=%223.6%22 ry=%228%22 transform=%22rotate%280.0 60 60%29%22/%3E%3Cellipse cx=%2260%22 cy=%2251%22 rx=%223.6%22 ry=%228%22 transform=%22rotate%2845.0 60 60%29%22/%3E%3Cellipse cx=%2260%22 cy=%2251%22 rx=%223.6%22 ry=%228%22 transform=%22rotate%2890.0 60 60%29%22/%3E%3Cellipse cx=%2260%22 cy=%2251%22 rx=%223.6%22 ry=%228%22 transform=%22rotate%28135.0 60 60%29%22/%3E%3Cellipse cx=%2260%22 cy=%2251%22 rx=%223.6%22 ry=%228%22 transform=%22rotate%28180.0 60 60%29%22/%3E%3Cellipse cx=%2260%22 cy=%2251%22 rx=%223.6%22 ry=%228%22 transform=%22rotate%28225.0 60 60%29%22/%3E%3Cellipse cx=%2260%22 cy=%2251%22 rx=%223.6%22 ry=%228%22 transform=%22rotate%28270.0 60 60%29%22/%3E%3Cellipse cx=%2260%22 cy=%2251%22 rx=%223.6%22 ry=%228%22 transform=%22rotate%28315.0 60 60%29%22/%3E%3Ccircle cx=%2260%22 cy=%2260%22 r=%222.2%22/%3E%3Cellipse cx=%220%22 cy=%22-8%22 rx=%223%22 ry=%227%22 transform=%22rotate%2845.0 0 0%29%22/%3E%3Cellipse cx=%220%22 cy=%22-8%22 rx=%223%22 ry=%227%22 transform=%22rotate%28135.0 0 0%29%22/%3E%3Cellipse cx=%220%22 cy=%22-8%22 rx=%223%22 ry=%227%22 transform=%22rotate%28225.0 0 0%29%22/%3E%3Cellipse cx=%220%22 cy=%22-8%22 rx=%223%22 ry=%227%22 transform=%22rotate%28315.0 0 0%29%22/%3E%3Ccircle cx=%220%22 cy=%220%22 r=%222%22/%3E%3Cellipse cx=%22120%22 cy=%22-8%22 rx=%223%22 ry=%227%22 transform=%22rotate%2845.0 120 0%29%22/%3E%3Cellipse cx=%22120%22 cy=%22-8%22 rx=%223%22 ry=%227%22 transform=%22rotate%28135.0 120 0%29%22/%3E%3Cellipse cx=%22120%22 cy=%22-8%22 rx=%223%22 ry=%227%22 transform=%22rotate%28225.0 120 0%29%22/%3E%3Cellipse cx=%22120%22 cy=%22-8%22 rx=%223%22 ry=%227%22 transform=%22rotate%28315.0 120 0%29%22/%3E%3Ccircle cx=%22120%22 cy=%220%22 r=%222%22/%3E%3Cellipse cx=%220%22 cy=%22112%22 rx=%223%22 ry=%227%22 transform=%22rotate%2845.0 0 120%29%22/%3E%3Cellipse cx=%220%22 cy=%22112%22 rx=%223%22 ry=%227%22 transform=%22rotate%28135.0 0 120%29%22/%3E%3Cellipse cx=%220%22 cy=%22112%22 rx=%223%22 ry=%227%22 transform=%22rotate%28225.0 0 120%29%22/%3E%3Cellipse cx=%220%22 cy=%22112%22 rx=%223%22 ry=%227%22 transform=%22rotate%28315.0 0 120%29%22/%3E%3Ccircle cx=%220%22 cy=%22120%22 r=%222%22/%3E%3Cellipse cx=%22120%22 cy=%22112%22 rx=%223%22 ry=%227%22 transform=%22rotate%2845.0 120 120%29%22/%3E%3Cellipse cx=%22120%22 cy=%22112%22 rx=%223%22 ry=%227%22 transform=%22rotate%28135.0 120 120%29%22/%3E%3Cellipse cx=%22120%22 cy=%22112%22 rx=%223%22 ry=%227%22 transform=%22rotate%28225.0 120 120%29%22/%3E%3Cellipse cx=%22120%22 cy=%22112%22 rx=%223%22 ry=%227%22 transform=%22rotate%28315.0 120 120%29%22/%3E%3Ccircle cx=%22120%22 cy=%22120%22 r=%222%22/%3E%3C/svg%3E"), linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.35) 70%, rgba(0, 0, 0, 0.18) 100%);
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22 viewBox=%220 0 120 120%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.3%22%3E%3Crect x=%2230%22 y=%2230%22 width=%2260%22 height=%2260%22/%3E%3Crect x=%2230%22 y=%2230%22 width=%2260%22 height=%2260%22 transform=%22rotate%2845 60 60%29%22/%3E%3Ccircle cx=%2260%22 cy=%2260%22 r=%2221%22/%3E%3Cellipse cx=%2260%22 cy=%2251%22 rx=%223.6%22 ry=%228%22 transform=%22rotate%280.0 60 60%29%22/%3E%3Cellipse cx=%2260%22 cy=%2251%22 rx=%223.6%22 ry=%228%22 transform=%22rotate%2845.0 60 60%29%22/%3E%3Cellipse cx=%2260%22 cy=%2251%22 rx=%223.6%22 ry=%228%22 transform=%22rotate%2890.0 60 60%29%22/%3E%3Cellipse cx=%2260%22 cy=%2251%22 rx=%223.6%22 ry=%228%22 transform=%22rotate%28135.0 60 60%29%22/%3E%3Cellipse cx=%2260%22 cy=%2251%22 rx=%223.6%22 ry=%228%22 transform=%22rotate%28180.0 60 60%29%22/%3E%3Cellipse cx=%2260%22 cy=%2251%22 rx=%223.6%22 ry=%228%22 transform=%22rotate%28225.0 60 60%29%22/%3E%3Cellipse cx=%2260%22 cy=%2251%22 rx=%223.6%22 ry=%228%22 transform=%22rotate%28270.0 60 60%29%22/%3E%3Cellipse cx=%2260%22 cy=%2251%22 rx=%223.6%22 ry=%228%22 transform=%22rotate%28315.0 60 60%29%22/%3E%3Ccircle cx=%2260%22 cy=%2260%22 r=%222.2%22/%3E%3Cellipse cx=%220%22 cy=%22-8%22 rx=%223%22 ry=%227%22 transform=%22rotate%2845.0 0 0%29%22/%3E%3Cellipse cx=%220%22 cy=%22-8%22 rx=%223%22 ry=%227%22 transform=%22rotate%28135.0 0 0%29%22/%3E%3Cellipse cx=%220%22 cy=%22-8%22 rx=%223%22 ry=%227%22 transform=%22rotate%28225.0 0 0%29%22/%3E%3Cellipse cx=%220%22 cy=%22-8%22 rx=%223%22 ry=%227%22 transform=%22rotate%28315.0 0 0%29%22/%3E%3Ccircle cx=%220%22 cy=%220%22 r=%222%22/%3E%3Cellipse cx=%22120%22 cy=%22-8%22 rx=%223%22 ry=%227%22 transform=%22rotate%2845.0 120 0%29%22/%3E%3Cellipse cx=%22120%22 cy=%22-8%22 rx=%223%22 ry=%227%22 transform=%22rotate%28135.0 120 0%29%22/%3E%3Cellipse cx=%22120%22 cy=%22-8%22 rx=%223%22 ry=%227%22 transform=%22rotate%28225.0 120 0%29%22/%3E%3Cellipse cx=%22120%22 cy=%22-8%22 rx=%223%22 ry=%227%22 transform=%22rotate%28315.0 120 0%29%22/%3E%3Ccircle cx=%22120%22 cy=%220%22 r=%222%22/%3E%3Cellipse cx=%220%22 cy=%22112%22 rx=%223%22 ry=%227%22 transform=%22rotate%2845.0 0 120%29%22/%3E%3Cellipse cx=%220%22 cy=%22112%22 rx=%223%22 ry=%227%22 transform=%22rotate%28135.0 0 120%29%22/%3E%3Cellipse cx=%220%22 cy=%22112%22 rx=%223%22 ry=%227%22 transform=%22rotate%28225.0 0 120%29%22/%3E%3Cellipse cx=%220%22 cy=%22112%22 rx=%223%22 ry=%227%22 transform=%22rotate%28315.0 0 120%29%22/%3E%3Ccircle cx=%220%22 cy=%22120%22 r=%222%22/%3E%3Cellipse cx=%22120%22 cy=%22112%22 rx=%223%22 ry=%227%22 transform=%22rotate%2845.0 120 120%29%22/%3E%3Cellipse cx=%22120%22 cy=%22112%22 rx=%223%22 ry=%227%22 transform=%22rotate%28135.0 120 120%29%22/%3E%3Cellipse cx=%22120%22 cy=%22112%22 rx=%223%22 ry=%227%22 transform=%22rotate%28225.0 120 120%29%22/%3E%3Cellipse cx=%22120%22 cy=%22112%22 rx=%223%22 ry=%227%22 transform=%22rotate%28315.0 120 120%29%22/%3E%3Ccircle cx=%22120%22 cy=%22120%22 r=%222%22/%3E%3C/svg%3E"), linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.35) 70%, rgba(0, 0, 0, 0.18) 100%);
+  -webkit-mask-size: 120px 120px, 100% 100%;
+  mask-size: 120px 120px, 100% 100%;
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+  animation: ornament-drift 90s linear infinite;
+}
+.ornament {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.bloom {
+  position: absolute;
+  color: var(--bloom);
+  animation: bloom-spin 140s linear infinite, bloom-breathe 9s ease-in-out infinite alternate;
+}
+.bloom svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.bloom-1 { width: 520px; height: 520px; left: -200px; top: 8%; }
+.bloom-2 { width: 440px; height: 440px; right: -170px; bottom: 6%; animation-direction: reverse, alternate; }
+
+@keyframes ornament-drift {
+  from { -webkit-mask-position: 0 0, 0 0; mask-position: 0 0, 0 0; }
+  to { -webkit-mask-position: 120px 120px, 0 0; mask-position: 120px 120px, 0 0; }
+}
+@keyframes bloom-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes bloom-breathe {
+  from { opacity: 0.7; }
+  to { opacity: 1; }
+}
+@media (max-width: 640px) {
+  .bloom-1 { width: 300px; height: 300px; left: -140px; }
+  .bloom-2 { width: 260px; height: 260px; right: -120px; }
+  body::before { -webkit-mask-size: 90px 90px, 100% 100%; mask-size: 90px 90px, 100% 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body::before, .bloom { animation: none !important; }
 }

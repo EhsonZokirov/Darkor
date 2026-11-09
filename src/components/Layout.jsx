@@ -2,6 +2,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import SponsorBanner from "./SponsorBanner";
+import Ornament from "./Ornament";
 
 // Общая «обёртка»: меню сверху и футер снизу на каждой странице.
 function Layout() {
@@ -9,6 +10,7 @@ function Layout() {
 
   return (
     <>
+      <Ornament />
       <Navbar />
 
       <div className="page" key={pathname}>
