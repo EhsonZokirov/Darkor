@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import Hero from "../components/Hero";
 import Marquee from "../components/Marquee";
 import TopBloggers from "../components/TopBloggers";
+import SponsorBanner from "../components/SponsorBanner";
 import Reveal from "../components/Reveal";
 import { useT } from "../i18n/lang";
 
@@ -27,6 +28,7 @@ function Home() {
       <Hero />
       <Marquee />
       <TopBloggers />
+      <SponsorBanner />
 
       <section className="steps section">
         <Reveal className="section-header">
