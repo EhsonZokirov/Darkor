@@ -156,7 +156,9 @@ h3 {
 ========================================================= */
 
 .page {
-  animation: pageIn 0.55s var(--ease) both;
+  /* backwards: после анимации transform снимается, иначе position:fixed
+     внутри страницы (окна) привязывается к странице, а не к экрану */
+  animation: pageIn 0.55s var(--ease) backwards;
 }
 
 .section {
@@ -1617,10 +1619,9 @@ label.checkbox {
   position: fixed;
   inset: 0;
   z-index: 200;
-  display: grid;
-  place-items: center;
+  display: flex;
   padding: 16px;
-  overflow-y: auto;
+  overflow: hidden;
   background: rgba(3, 3, 6, 0.75);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
@@ -1630,6 +1631,13 @@ label.checkbox {
   position: relative;
   width: 100%;
   max-width: 480px;
+  margin: auto;
+  /* если окно выше экрана — оно прокручивается внутри себя */
+  max-height: calc(100vh - 32px);
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   padding: clamp(22px, 5vw, 36px);
   background: var(--surface);
   border: 1px solid var(--border-2);
@@ -1653,9 +1661,12 @@ label.checkbox {
   color: var(--text);
 }
 .modal-close {
-  position: absolute;
-  top: 14px;
-  right: 14px;
+  /* остаётся на виду при прокрутке окна */
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  float: right;
+  margin: -12px -12px 0 8px;
   display: grid;
   place-items: center;
   width: 36px;
@@ -1669,6 +1680,22 @@ label.checkbox {
 .modal-close:hover {
   color: var(--text);
   transform: rotate(90deg);
+}
+
+/* Невысокие экраны (телефон в альбомной, маленькие окна): компактнее */
+@media (max-height: 760px) {
+  .modal { padding: 20px 22px; border-radius: 20px; }
+  .modal form { gap: 12px; }
+  .modal h2 { font-size: 21px; }
+  .modal-sub { margin-top: -6px; font-size: 14px; }
+  .modal textarea { min-height: 72px; }
+}
+@media (max-width: 520px) {
+  .modal-backdrop { padding: 10px; }
+  .modal {
+    max-height: calc(100vh - 20px);
+    max-height: calc(100dvh - 20px);
+  }
 }
 
 /* =========================================================

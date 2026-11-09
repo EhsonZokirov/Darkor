@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { FaTimes } from "react-icons/fa";
 import { useFormSubmit } from "../hooks/useFormSubmit";
 import { CONTACT_HINT, isValidContact } from "../lib/validate";
@@ -69,7 +70,8 @@ function OrderModal({ blogger, onClose, title = "Заказать рекламу
 
   const done = status === "done";
 
-  return (
+  // Портал в body: окно всегда привязано к экрану, а не к странице
+  return createPortal(
     <div
       className="modal-backdrop"
       onMouseDown={(event) => {
@@ -160,7 +162,8 @@ function OrderModal({ blogger, onClose, title = "Заказать рекламу
           </form>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
