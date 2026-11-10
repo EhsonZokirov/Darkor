@@ -1,25 +1,9 @@
 -- Статус «прочитано» для заявок и сообщений + значок уведомлений в меню админа.
--- Безопасно запускать повторно.
+-- Запускать ОДИН раз. Если запустить повторно, первые две строки покажут
+-- «column is_read already exists» — это безвредно, остальное применится.
 
-do $$
-begin
-  if not exists (
-    select 1 from information_schema.columns
-    where table_schema = 'public' and table_name = 'ad_requests' and column_name = 'is_read'
-  ) then
-    alter table public.ad_requests add column is_read boolean not null default false;
-  end if;
-end $$;
-
-do $$
-begin
-  if not exists (
-    select 1 from information_schema.columns
-    where table_schema = 'public' and table_name = 'messages' and column_name = 'is_read'
-  ) then
-    alter table public.messages add column is_read boolean not null default false;
-  end if;
-end $$;
+alter table public.ad_requests add column is_read boolean not null default false;
+alter table public.messages add column is_read boolean not null default false;
 
 -- Админ может отмечать прочитанным / возвращать в новые.
 drop policy if exists "ad_requests: admin updates" on public.ad_requests;

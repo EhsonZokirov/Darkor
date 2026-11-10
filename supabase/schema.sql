@@ -132,26 +132,7 @@ create table if not exists public.messages (
   created_at timestamptz not null default now()
 );
 
--- для баз, созданных раньше (колонка «прочитано»)
-do $$
-begin
-  if not exists (
-    select 1 from information_schema.columns
-    where table_schema = 'public' and table_name = 'ad_requests' and column_name = 'is_read'
-  ) then
-    alter table public.ad_requests add column is_read boolean not null default false;
-  end if;
-end $$;
-
-do $$
-begin
-  if not exists (
-    select 1 from information_schema.columns
-    where table_schema = 'public' and table_name = 'messages' and column_name = 'is_read'
-  ) then
-    alter table public.messages add column is_read boolean not null default false;
-  end if;
-end $$;
+-- Если база создана раньше (до статуса «прочитано») — один раз выполните supabase/admin_read_status.sql
 
 
 -- ---------- 5. Права доступа (Row Level Security) ----------
