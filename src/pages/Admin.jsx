@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { FiCheck, FiCheckCircle, FiRotateCcw } from "react-icons/fi";
 import BloggerEditor from "../components/BloggerEditor";
 import { useAuth } from "../context/auth";
 import SmmEditor from "../components/SmmEditor";
@@ -13,8 +14,10 @@ import {
   adminListMessages,
   adminListSmm,
   adminSaveSmm,
+  adminSetRead,
   adminSetStatus,
 } from "../lib/api";
+import { ADMIN_CHANGED } from "../hooks/useAdminBadge";
 import { useT } from "../i18n/lang";
 
 const STATUS_LABEL = {
@@ -29,6 +32,46 @@ const FILTERS = [
   { value: "rejected", label: "Отклонены" },
   { value: "", label: "Все" },
 ];
+
+const isNew = (item) => item.is_read === false;
+const notifyAdminChanged = () => window.dispatchEvent(new Event(ADMIN_CHANGED));
+
+// Панель «Новые / Все» + «Прочитать все» над списком заявок или сообщений
+function ReadBar({ t, filter, setFilter, newCount, total, onMarkAll, busy }) {
+  return (
+    <div className="admin-readbar">
+      <div className="admin-filters">
+        {[
+          ["new", "Новые", newCount],
+          ["all", "Все", total],
+        ].map(([value, label, n]) => (
+          <button
+            key={value}
+            type="button"
+            className={`chip ${filter === value ? "active" : ""}`}
+            onClick={() => setFilter(value)}
+          >
+            {t(label)}
+            <span className="admin-count">{n}</span>
+          </button>
+        ))}
+      </div>
+      {newCount > 0 && (
+        <button type="button" className="btn btn-ghost admin-markall" disabled={busy} onClick={onMarkAll}>
+          <FiCheckCircle aria-hidden="true" /> {t("Прочитать все")}
+        </button>
+      )}
+    </div>
+  );
+}
+
+function ReadSetupNote({ t }) {
+  return (
+    <p className="form-note admin-setup">
+      {t("Чтобы работали отметки «прочитано» и цифра в меню, один раз выполните в Supabase SQL из файла supabase/admin_read_status.sql (см. README).")}
+    </p>
+  );
+}
 
 const EMPTY = { loaded: false, error: "", bloggers: [], ads: [], messages: [], smm: [] };
 
@@ -84,6 +127,7 @@ function Admin() {
   const [busyId, setBusyId] = useState(null);
   const [smmEditing, setSmmEditing] = useState(null); // null | "new" | id
   const [editingId, setEditingId] = useState(null);
+  const [readFilter, setReadFilter] = useState("new"); // new | all
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -114,6 +158,7 @@ function Admin() {
     try {
       await job();
       await reload();
+      notifyAdminChanged();
     } catch (error) {
       setData((current) => ({ ...current, error: error.message }));
     } finally {
@@ -169,10 +214,21 @@ function Admin() {
   const visible = data.bloggers.filter((item) => !filter || item.status === filter);
   const pendingCount = data.bloggers.filter((item) => item.status === "pending").length;
 
+  // Колонка is_read появляется после запуска supabase/admin_read_status.sql
+  const readSupported = [...data.ads, ...data.messages].every((item) => typeof item.is_read === "boolean");
+  const effectiveFilter = readSupported ? readFilter : "all";
+  const newAds = data.ads.filter(isNew);
+  const newMessages = data.messages.filter(isNew);
+  const shownAds = effectiveFilter === "new" ? newAds : data.ads;
+  const shownMessages = effectiveFilter === "new" ? newMessages : data.messages;
+
+  const markAll = (table, list, key) =>
+    run(key, () => adminSetRead(table, list.map((item) => item.id), true));
+
   const tabs = [
     { value: "bloggers", label: "Блогеры", count: pendingCount },
-    { value: "ads", label: "Заявки на рекламу", count: data.ads.length },
-    { value: "messages", label: "Сообщения", count: data.messages.length },
+    { value: "ads", label: "Заявки на рекламу", count: readSupported ? newAds.length : data.ads.length },
+    { value: "messages", label: "Сообщения", count: readSupported ? newMessages.length : data.messages.length },
     { value: "smm", label: "SMM-специалисты", count: 0 },
   ];
 
@@ -312,39 +368,84 @@ function Admin() {
       )}
 
       {data.loaded && tab === "ads" && (
-        <div className="admin-list">
-          {data.ads.length === 0 && <p className="admin-empty">{t("Заявок пока нет.")}</p>}
+        <>
+          {!readSupported && <ReadSetupNote t={t} />}
+          {readSupported && (
+            <ReadBar
+              t={t}
+              filter={effectiveFilter}
+              setFilter={setReadFilter}
+              newCount={newAds.length}
+              total={data.ads.length}
+              busy={busyId === "readall-ads"}
+              onMarkAll={() => markAll("ad_requests", newAds, "readall-ads")}
+            />
+          )}
 
-          {data.ads.map((item) => (
-            <article className="admin-item card-surface" key={item.id}>
-              <div className="admin-item-body">
-                <div className="admin-item-top">
-                  <h3>{t("Кому:")} {item.blogger_name}</h3>
-                  <span className="admin-date">{formatDate(item.created_at)}</span>
-                </div>
-                <p className="admin-meta">
-                  {item.name} · <strong>{item.contact}</strong>
-                </p>
-                {item.message && <p className="admin-text">{item.message}</p>}
+          <div className="admin-list">
+            {shownAds.length === 0 && (
+              <p className="admin-empty">
+                {data.ads.length === 0 ? t("Заявок пока нет.") : t("Новых заявок нет.")}
+              </p>
+            )}
 
-                <div className="admin-actions">
-                  <button
-                    type="button"
-                    className="btn btn-danger"
-                    disabled={busyId === `ad-${item.id}`}
-                    onClick={() => {
-                      if (window.confirm(t("Удалить эту заявку навсегда?"))) {
-                        run(`ad-${item.id}`, () => adminDeleteRow("ad_requests", item.id));
-                      }
-                    }}
-                  >
-                    {t("Удалить")}
-                  </button>
+            {shownAds.map((item) => (
+              <article
+                className={`admin-item card-surface${readSupported ? (isNew(item) ? " is-new" : " is-read") : ""}`}
+                key={item.id}
+              >
+                <div className="admin-item-body">
+                  <div className="admin-item-top">
+                    <h3>
+                      {t("Кому:")} {item.blogger_name}
+                      {isNew(item) && <span className="admin-new">{t("Новое")}</span>}
+                    </h3>
+                    <span className="admin-date">{formatDate(item.created_at)}</span>
+                  </div>
+                  <p className="admin-meta">
+                    {item.name} · <strong>{item.contact}</strong>
+                  </p>
+                  {item.message && <p className="admin-text">{item.message}</p>}
+
+                  <div className="admin-actions">
+                    {readSupported && (
+                      <button
+                        type="button"
+                        className="btn btn-ghost"
+                        disabled={busyId === `ad-read-${item.id}`}
+                        onClick={() =>
+                          run(`ad-read-${item.id}`, () => adminSetRead("ad_requests", [item.id], isNew(item)))
+                        }
+                      >
+                        {isNew(item) ? (
+                          <>
+                            <FiCheck aria-hidden="true" /> {t("Прочитано")}
+                          </>
+                        ) : (
+                          <>
+                            <FiRotateCcw aria-hidden="true" /> {t("Вернуть в новые")}
+                          </>
+                        )}
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      className="btn btn-danger"
+                      disabled={busyId === `ad-${item.id}`}
+                      onClick={() => {
+                        if (window.confirm(t("Удалить эту заявку навсегда?"))) {
+                          run(`ad-${item.id}`, () => adminDeleteRow("ad_requests", item.id));
+                        }
+                      }}
+                    >
+                      {t("Удалить")}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </article>
-          ))}
-        </div>
+              </article>
+            ))}
+          </div>
+        </>
       )}
 
       {data.loaded && tab === "smm" && (
@@ -449,40 +550,86 @@ function Admin() {
       )}
 
       {data.loaded && tab === "messages" && (
-        <div className="admin-list">
-          {data.messages.length === 0 && <p className="admin-empty">{t("Сообщений пока нет.")}</p>}
+        <>
+          {!readSupported && <ReadSetupNote t={t} />}
+          {readSupported && (
+            <ReadBar
+              t={t}
+              filter={effectiveFilter}
+              setFilter={setReadFilter}
+              newCount={newMessages.length}
+              total={data.messages.length}
+              busy={busyId === "readall-messages"}
+              onMarkAll={() => markAll("messages", newMessages, "readall-messages")}
+            />
+          )}
 
-          {data.messages.map((item) => (
-            <article className="admin-item card-surface" key={item.id}>
-              <div className="admin-item-body">
-                <div className="admin-item-top">
-                  <h3>{item.name}</h3>
-                  <span className="admin-date">{formatDate(item.created_at)}</span>
-                </div>
-                <p className="admin-meta">
-                  <strong>{item.contact}</strong>
-                </p>
-                <p className="admin-text">{item.message}</p>
+          <div className="admin-list">
+            {shownMessages.length === 0 && (
+              <p className="admin-empty">
+                {data.messages.length === 0 ? t("Сообщений пока нет.") : t("Новых сообщений нет.")}
+              </p>
+            )}
 
-                <div className="admin-actions">
-                  <button
-                    type="button"
-                    className="btn btn-danger"
-                    disabled={busyId === `msg-${item.id}`}
-                    onClick={() => {
-                      if (window.confirm(t("Удалить это сообщение навсегда?"))) {
-                        run(`msg-${item.id}`, () => adminDeleteRow("messages", item.id));
-                      }
-                    }}
-                  >
-                    {t("Удалить")}
-                  </button>
+            {shownMessages.map((item) => (
+              <article
+                className={`admin-item card-surface${readSupported ? (isNew(item) ? " is-new" : " is-read") : ""}`}
+                key={item.id}
+              >
+                <div className="admin-item-body">
+                  <div className="admin-item-top">
+                    <h3>
+                      {item.name}
+                      {isNew(item) && <span className="admin-new">{t("Новое")}</span>}
+                    </h3>
+                    <span className="admin-date">{formatDate(item.created_at)}</span>
+                  </div>
+                  <p className="admin-meta">
+                    <strong>{item.contact}</strong>
+                  </p>
+                  <p className="admin-text">{item.message}</p>
+
+                  <div className="admin-actions">
+                    {readSupported && (
+                      <button
+                        type="button"
+                        className="btn btn-ghost"
+                        disabled={busyId === `msg-read-${item.id}`}
+                        onClick={() =>
+                          run(`msg-read-${item.id}`, () => adminSetRead("messages", [item.id], isNew(item)))
+                        }
+                      >
+                        {isNew(item) ? (
+                          <>
+                            <FiCheck aria-hidden="true" /> {t("Прочитано")}
+                          </>
+                        ) : (
+                          <>
+                            <FiRotateCcw aria-hidden="true" /> {t("Вернуть в новые")}
+                          </>
+                        )}
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      className="btn btn-danger"
+                      disabled={busyId === `msg-${item.id}`}
+                      onClick={() => {
+                        if (window.confirm(t("Удалить это сообщение навсегда?"))) {
+                          run(`msg-${item.id}`, () => adminDeleteRow("messages", item.id));
+                        }
+                      }}
+                    >
+                      {t("Удалить")}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </article>
-          ))}
-        </div>
+              </article>
+            ))}
+          </div>
+        </>
       )}
+
     </Shell>
   );
 }

@@ -5,6 +5,7 @@ import { useAuth } from "../context/auth";
 import { useLang } from "../i18n/lang";
 import ThemeToggle from "./ThemeToggle";
 import { BACKEND_ENABLED } from "../lib/supabase";
+import { useAdminBadge } from "../hooks/useAdminBadge";
 
 const LINKS = [
   { to: "/bloggers", label: "Блогеры" },
@@ -16,6 +17,8 @@ function Navbar() {
   const { lang, setLang, t } = useLang();
   const { user, role } = useAuth();
   const [open, setOpen] = useState(false);
+  const adminCount = useAdminBadge(BACKEND_ENABLED && role === "admin");
+  const badgeText = adminCount > 99 ? "99+" : String(adminCount);
   const [scrolled, setScrolled] = useState(() => window.scrollY > 10);
 
   const closeMenu = () => setOpen(false);
@@ -76,6 +79,15 @@ function Navbar() {
               className={({ isActive }) => (isActive ? "active" : "")}
             >
               {t("Админ")}
+              {adminCount > 0 && (
+                <span
+                  className="nav-badge"
+                  title={t("Новых уведомлений: {n}", { n: adminCount })}
+                  aria-label={t("Новых уведомлений: {n}", { n: adminCount })}
+                >
+                  {badgeText}
+                </span>
+              )}
             </NavLink>
           )}
 
@@ -129,6 +141,7 @@ function Navbar() {
           <span />
           <span />
           <span />
+          {adminCount > 0 && !open && <i className="menu-dot" aria-hidden="true" />}
         </button>
       </div>
 
