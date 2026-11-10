@@ -133,8 +133,25 @@ create table if not exists public.messages (
 );
 
 -- для баз, созданных раньше (колонка «прочитано»)
-alter table public.ad_requests add column if not exists is_read boolean not null default false;
-alter table public.messages    add column if not exists is_read boolean not null default false;
+do $$
+begin
+  if not exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'ad_requests' and column_name = 'is_read'
+  ) then
+    alter table public.ad_requests add column is_read boolean not null default false;
+  end if;
+end $$;
+
+do $$
+begin
+  if not exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'messages' and column_name = 'is_read'
+  ) then
+    alter table public.messages add column is_read boolean not null default false;
+  end if;
+end $$;
 
 
 -- ---------- 5. Права доступа (Row Level Security) ----------
