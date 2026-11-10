@@ -119,6 +119,7 @@ create table if not exists public.ad_requests (
   name         text not null check (char_length(name) between 2 and 100),
   contact      text not null check (char_length(contact) between 3 and 200),
   message      text check (char_length(message) <= 2000),
+  is_read      boolean not null default false,
   created_at   timestamptz not null default now()
 );
 
@@ -127,8 +128,13 @@ create table if not exists public.messages (
   name       text not null check (char_length(name) between 2 and 100),
   contact    text not null check (char_length(contact) between 3 and 200),
   message    text not null check (char_length(message) between 5 and 2000),
+  is_read    boolean not null default false,
   created_at timestamptz not null default now()
 );
+
+-- для баз, созданных раньше (колонка «прочитано»)
+alter table public.ad_requests add column if not exists is_read boolean not null default false;
+alter table public.messages    add column if not exists is_read boolean not null default false;
 
 
 -- ---------- 5. Права доступа (Row Level Security) ----------
@@ -182,11 +188,15 @@ create policy "contacts: owner or admin" on public.blogger_contacts
 -- ad_requests и messages: отправить может любой посетитель, читать и удалять — только админ.
 drop policy if exists "ad_requests: anyone can send" on public.ad_requests;
 create policy "ad_requests: anyone can send" on public.ad_requests
-  for insert to anon, authenticated with check (true);
+  for insert to anon, authenticated with check (not is_read);
 
 drop policy if exists "ad_requests: admin reads" on public.ad_requests;
 create policy "ad_requests: admin reads" on public.ad_requests
   for select to authenticated using (public.is_admin());
+
+drop policy if exists "ad_requests: admin updates" on public.ad_requests;
+create policy "ad_requests: admin updates" on public.ad_requests
+  for update to authenticated using (public.is_admin()) with check (public.is_admin());
 
 drop policy if exists "ad_requests: admin deletes" on public.ad_requests;
 create policy "ad_requests: admin deletes" on public.ad_requests
@@ -194,11 +204,15 @@ create policy "ad_requests: admin deletes" on public.ad_requests
 
 drop policy if exists "messages: anyone can send" on public.messages;
 create policy "messages: anyone can send" on public.messages
-  for insert to anon, authenticated with check (true);
+  for insert to anon, authenticated with check (not is_read);
 
 drop policy if exists "messages: admin reads" on public.messages;
 create policy "messages: admin reads" on public.messages
   for select to authenticated using (public.is_admin());
+
+drop policy if exists "messages: admin updates" on public.messages;
+create policy "messages: admin updates" on public.messages
+  for update to authenticated using (public.is_admin()) with check (public.is_admin());
 
 drop policy if exists "messages: admin deletes" on public.messages;
 create policy "messages: admin deletes" on public.messages

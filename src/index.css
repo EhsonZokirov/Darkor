@@ -2309,6 +2309,110 @@ a.contact-card:hover {
   background: var(--accent-grad);
   border-radius: 999px;
 }
+/* Значок новых уведомлений в меню админа */
+.nav-badge {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  margin-left: 7px;
+  padding: 0 6px;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  color: #fff;
+  background: linear-gradient(135deg, #ff4b4b, #d4142a);
+  border-radius: 999px;
+  vertical-align: 1px;
+  animation: badge-pop 0.45s var(--ease) both, badge-ping 2.2s ease-out 0.5s infinite;
+}
+.nav-links a.active .nav-badge,
+.nav-links a:hover .nav-badge {
+  color: #fff;
+}
+.menu-dot {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 13px;
+  height: 13px;
+  background: linear-gradient(135deg, #ff4b4b, #d4142a);
+  border: 2px solid var(--bg, #0a0a0f);
+  border-radius: 50%;
+  animation: badge-ping 2.2s ease-out infinite;
+}
+@keyframes badge-pop {
+  from { transform: scale(0); }
+  70% { transform: scale(1.25); }
+  to { transform: scale(1); }
+}
+@keyframes badge-ping {
+  0% { box-shadow: 0 0 0 0 rgba(255, 60, 70, 0.55); }
+  70%, 100% { box-shadow: 0 0 0 9px rgba(255, 60, 70, 0); }
+}
+
+.admin-readbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin-bottom: 18px;
+}
+.admin-readbar .admin-filters {
+  margin-bottom: 0;
+}
+.admin-markall {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.admin-setup {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border: 1px dashed var(--border-2);
+  border-radius: 12px;
+}
+.admin-item.is-new {
+  border-color: rgba(255, 90, 70, 0.45);
+  box-shadow: inset 4px 0 0 var(--accent), 0 0 24px rgba(255, 90, 70, 0.08);
+  animation: admin-new-in 0.5s var(--ease) both;
+}
+.admin-item.is-read {
+  opacity: 0.6;
+}
+.admin-item.is-read:hover {
+  opacity: 1;
+}
+.admin-new {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 3px 9px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--accent-grad);
+  border-radius: 999px;
+  vertical-align: 2px;
+  animation: badge-ping 2.4s ease-out infinite;
+}
+.admin-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+@keyframes admin-new-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-badge, .menu-dot, .admin-new, .admin-item.is-new { animation: none !important; }
+}
+
 .admin-empty {
   padding: 40px 0;
   text-align: center;

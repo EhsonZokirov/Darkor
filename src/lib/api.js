@@ -159,6 +159,29 @@ export async function adminListMessages() {
   );
 }
 
+// Отметить заявки/сообщения прочитанными (или вернуть в новые). Ничего не удаляет.
+export async function adminSetRead(table, ids, isRead) {
+  if (!ids.length) return;
+  check(await supabase.from(table).update({ is_read: isRead }).in("id", ids));
+}
+
+// Сколько «новых» дел у админа: непрочитанные заявки и сообщения + блогеры на проверке.
+export async function adminCountNew() {
+  const count = async (table, column, value) => {
+    const { count: n, error } = await supabase
+      .from(table)
+      .select("id", { count: "exact", head: true })
+      .eq(column, value);
+    return error ? 0 : n || 0;
+  };
+  const [ads, messages, bloggers] = await Promise.all([
+    count("ad_requests", "is_read", false),
+    count("messages", "is_read", false),
+    count("bloggers", "status", "pending"),
+  ]);
+  return { ads, messages, bloggers, total: ads + messages + bloggers };
+}
+
 export async function adminDeleteRow(table, id) {
   check(await supabase.from(table).delete().eq("id", id));
 }
