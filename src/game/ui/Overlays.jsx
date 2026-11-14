@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { FaHeart, FaUserPlus, FaEye, FaGem, FaTrophy, FaLock, FaCheck } from "react-icons/fa";
-import { CHARACTERS, SKINS, getCharacter } from "../characters";
+import { CHARACTERS, SKINS, getCharacter, skinFor } from "../characters";
 import { drawCharacter } from "../drawer";
 import { useT, useLang } from "../../i18n/lang";
 
@@ -166,7 +166,7 @@ export function Skins({ characterId, faces, skinId, picked, onPick, onClose }) {
                 data-skin={s.id}
                 aria-pressed={active}
               >
-                <SkinPreview face={faces[char.id]?.canvas} skin={s} />
+                <SkinPreview face={faces[char.id]?.canvas} skin={skinFor(char, s)} />
                 <strong>{t(s.name)}</strong>
                 <span>
                   {locked ? <><FaLock /> {t("Нужно бонусов: {n}", { n: s.unlock })}</> : active ? <><FaCheck /> {t("Надет")}</> : t("Надеть")}

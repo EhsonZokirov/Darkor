@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "../game/game.css";
 import { useAuth } from "../context/auth";
-import { CHARACTERS, SKINS, getCharacter, getSkin } from "../game/characters";
+import { CHARACTERS, SKINS, getCharacter, getSkin, skinFor } from "../game/characters";
 import { createSession } from "../game/session";
 import { createSound } from "../game/sound";
 import { store } from "../game/storage";
@@ -64,7 +64,7 @@ function Game() {
   const onHud = useCallback((state) => {
     const host = hostRef.current;
     if (!host) return;
-    if (!hudEls.current) {
+    if (!hudEls.current || !hudEls.current.score?.isConnected) {
       const map = {};
       host.querySelectorAll("[data-hud]").forEach((el) => (map[el.dataset.hud] = el));
       hudEls.current = map;
@@ -154,7 +154,7 @@ function Game() {
   // Внешний вид персонажа на сцене
   useEffect(() => {
     const face = faces[lookCharId]?.canvas;
-    sessionRef.current?.setLook(face, activeSkin);
+    sessionRef.current?.setLook(face, skinFor(getCharacter(lookCharId), activeSkin));
   }, [faces, lookCharId, activeSkin]);
 
   useEffect(() => {
@@ -299,7 +299,7 @@ function Game() {
             focus={focus}
             chosen={chosen}
             faces={faces}
-            skin={activeSkin}
+            skin={skinFor(CHARACTERS[focus], activeSkin)}
             bestByChar={bestByChar}
             name={name}
             muted={muted}
