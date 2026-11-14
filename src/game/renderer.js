@@ -2,6 +2,7 @@
 // Слои один раз рисуются в «плитки» (offscreen canvas), потом только сдвигаются.
 import { WORLD_H, GROUND_Y, PLAYER } from "./constants";
 import { drawCharacter } from "./drawer";
+import { drawSprite, pickFrame, skinAtlas } from "./sprites";
 import { createRng } from "./rng";
 
 const TILE_W = 960;
@@ -154,6 +155,8 @@ export function createRenderer(canvas, { reducedMotion = false } = {}) {
   let shake = 0;
   let face = null;
   let skin = null;
+  let sprite = null;
+  let atlas = null;
   let lastNow = 0;
   let scale = 1;
   let visibleH = WORLD_H;
@@ -442,7 +445,17 @@ export function createRenderer(canvas, { reducedMotion = false } = {}) {
       ctx.fill();
     }
 
-    if (skin && !opts.hidePlayer) {
+    if (sprite && atlas && !opts.hidePlayer) {
+      drawSprite(ctx, {
+        sprite,
+        atlas,
+        frame: pickFrame(state),
+        x: px,
+        y: GROUND_Y - p.y,
+        spin: p.spin,
+        aura: skin?.aura,
+      });
+    } else if (skin && !opts.hidePlayer) {
       drawCharacter(ctx, {
         face,
         skin,
@@ -487,9 +500,11 @@ export function createRenderer(canvas, { reducedMotion = false } = {}) {
     get width() {
       return W;
     },
-    setLook(nextFace, nextSkin) {
+    setLook(nextFace, nextSkin, nextSprite = null) {
       face = nextFace;
       skin = nextSkin;
+      sprite = nextSprite;
+      atlas = nextSprite ? skinAtlas(nextSprite, nextSkin) : null;
     },
   };
 }

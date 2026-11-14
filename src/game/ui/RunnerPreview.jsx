@@ -1,8 +1,9 @@
 import { useEffect, useRef } from "react";
 import { drawCharacter } from "../drawer";
+import { drawSprite, skinAtlas } from "../sprites";
 
 // Живое превью выбранного блогера: бежит на месте, по нажатию прыгает.
-function RunnerPreview({ face, skin }) {
+function RunnerPreview({ face, skin, sprite }) {
   const ref = useRef(null);
   const jump = useRef(0);
 
@@ -31,12 +32,19 @@ function RunnerPreview({ face, skin }) {
       glow.addColorStop(1, "rgba(255,43,58,0)");
       g.fillStyle = glow;
       g.fillRect(0, c.height - 90, c.width, 90);
-      drawCharacter(g, { face, skin, x: c.width / 2, y: c.height - 14 - lift, phase, air: lift > 1, scale: 1.25 });
+      if (sprite) {
+        // готовый спрайт: стоит и «дышит», по нажатию прыгает
+        const breathe = reduced ? 1 : 1 + Math.sin(ts / 380) * 0.012;
+        const frame = lift > 1 ? 6 : 0;
+        drawSprite(g, { sprite, atlas: skinAtlas(sprite, skin), frame, x: c.width / 2, y: c.height - 14 - lift, scale: 1.05 * breathe, aura: skin.aura });
+      } else {
+        drawCharacter(g, { face, skin, x: c.width / 2, y: c.height - 14 - lift, phase, air: lift > 1, scale: 1.25 });
+      }
       raf = requestAnimationFrame(frame);
     };
     raf = requestAnimationFrame(frame);
     return () => cancelAnimationFrame(raf);
-  }, [face, skin]);
+  }, [face, skin, sprite]);
 
   return (
     <canvas

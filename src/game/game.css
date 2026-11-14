@@ -302,3 +302,9 @@
   .runner-preview { max-width: 180px; }
   .game-title { font-size: clamp(24px, 7vw, 38px); }
 }
+
+/* Карточка со спрайтом: показываем фигуру целиком, без круглой рамки */
+.pick-face.sprite { width: auto; height: 62px; aspect-ratio: auto; border: 0; border-radius: 0; background: none; overflow: visible; display: flex; justify-content: center; }
+.pick-face.sprite img { width: auto; height: 100%; object-fit: contain; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6)); }
+.pick-card.focus .pick-face.sprite { border: 0; }
+.pick-card { padding-top: 12px; }

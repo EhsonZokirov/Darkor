@@ -34,7 +34,7 @@ export function createEngine({ width = 360, seed = Date.now() } = {}) {
     score: 0,
     counts: { like: 0, follower: 0, view: 0, diamond: 0 },
     pickedTotal: 0,
-    player: { y: 0, vy: 0, jumps: 0, grounded: true, spin: 0, landed: 0 },
+    player: { y: 0, vy: 0, jumps: 0, grounded: true, spin: 0, landed: 0, airStart: 0 },
     obstacles: [],
     pickups: [],
     events: [], // очередь для звука и частиц; её забирает отрисовка
@@ -208,6 +208,7 @@ export function createEngine({ width = 360, seed = Date.now() } = {}) {
       buffer = PHYSICS.jumpBuffer;
       return false;
     }
+    if (p.jumps === 0) p.airStart = state.time;
     p.vy = p.jumps === 0 ? PHYSICS.jump : PHYSICS.doubleJump;
     p.jumps += 1;
     p.grounded = false;
