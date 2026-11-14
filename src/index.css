@@ -3276,3 +3276,57 @@ body::before {
 @media (max-width: 820px) {
   .nav-links a.nav-game:not(.btn) { align-self: flex-start; margin: 10px 0 0 4px; }
 }
+
+/* =========================================================
+   Рекламный менеджер (админка)
+========================================================= */
+.ad-item { animation: ad-item-in 0.5s var(--ease) both; }
+.ad-item:nth-child(2) { animation-delay: 0.05s; }
+.ad-item:nth-child(3) { animation-delay: 0.1s; }
+.ad-item:nth-child(4) { animation-delay: 0.15s; }
+.ad-item > img { object-fit: contain; background: var(--surface-2, rgba(255,255,255,0.04)); border-radius: 12px; padding: 6px; }
+
+.ad-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 12px 0;
+}
+.ad-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-2, var(--border));
+  border-radius: 12px;
+  transition: transform 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+.ad-stat:hover { transform: translateY(-2px); border-color: var(--accent, currentColor); }
+.ad-stat-label { font-size: 12px; opacity: 0.65; text-transform: uppercase; letter-spacing: 0.04em; }
+.ad-stat-num { font-weight: 700; font-size: 18px; }
+.ad-stat-num small { font-weight: 400; font-size: 12px; opacity: 0.65; }
+.ad-stat-ctr { font-size: 13px; opacity: 0.8; }
+
+.ad-report {
+  margin: 8px 0 12px;
+  padding: 14px;
+  border: 1px dashed var(--border-2, var(--border));
+  border-radius: 14px;
+  animation: ad-report-in 0.4s var(--ease) both;
+  transform-origin: top;
+}
+.ad-totals { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-bottom: 10px; }
+.ad-totals b { font-size: 20px; }
+.ad-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 10px; }
+.ad-table th, .ad-table td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); }
+.ad-table tbody tr { animation: ad-item-in 0.35s var(--ease) both; }
+
+@keyframes ad-item-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@keyframes ad-report-in { from { opacity: 0; transform: scaleY(0.92); } to { opacity: 1; transform: none; } }
+
+@media (max-width: 600px) {
+  .ad-stats { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ad-item, .ad-report, .ad-table tbody tr { animation: none !important; }
+}

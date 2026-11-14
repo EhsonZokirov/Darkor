@@ -228,3 +228,40 @@ export async function adminSaveSmm(id, fields) {
 export async function adminDeleteSmm(id) {
   check(await supabase.from("smm_specialists").delete().eq("id", id));
 }
+
+// ---------- Реклама ----------
+
+// Действующие баннеры (фильтр по сроку и «включён» делает сама база).
+export async function fetchLiveBanners() {
+  return check(await supabase.from("ad_banners").select("*").order("id", { ascending: true }));
+}
+
+// Учёт показа/клика. Ошибки молча глотаем: статистика не должна ломать сайт.
+export async function trackAd(bannerId, kind) {
+  try {
+    await supabase.rpc("track_ad", { p_banner: bannerId, p_kind: kind });
+  } catch {
+    /* не страшно */
+  }
+}
+
+export async function adminListBanners() {
+  return check(await supabase.from("ad_banners").select("*").order("created_at", { ascending: false }));
+}
+
+// Статистика по дням за всё время; суммы по периодам считает админка.
+export async function adminBannerStats() {
+  return check(await supabase.from("ad_stats").select("banner_id, day, views, clicks"));
+}
+
+export async function adminSaveBanner(id, fields) {
+  if (id) {
+    check(await supabase.from("ad_banners").update(fields).eq("id", id));
+  } else {
+    check(await supabase.from("ad_banners").insert(fields));
+  }
+}
+
+export async function adminDeleteBanner(id) {
+  check(await supabase.from("ad_banners").delete().eq("id", id));
+}
