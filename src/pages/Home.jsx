@@ -30,6 +30,19 @@ function Home() {
       <TopBloggers />
       <SponsorBanner />
 
+      <section className="section">
+        <Reveal className="game-teaser">
+          <div>
+            <span className="section-label">{t("МИНИ-ИГРА")}</span>
+            <h2>DAVODAVSHIK</h2>
+            <p>{t("Беги по ночному Душанбе за любимого блогера, собирай лайки и бей рекорды.")}</p>
+          </div>
+          <Link to="/game" className="btn btn-primary game-teaser-btn">
+            {t("Играть")}
+          </Link>
+        </Reveal>
+      </section>
+
       <section className="steps section">
         <Reveal className="section-header">
           <div>

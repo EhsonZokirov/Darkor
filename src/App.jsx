@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Layout from "./components/Layout";
@@ -16,6 +17,9 @@ import ResetPassword from "./pages/ResetPassword";
 import Privacy from "./pages/Privacy";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
+
+// Игра грузится отдельным куском — основной сайт от неё не тяжелеет.
+const Game = lazy(() => import("./pages/Game"));
 
 function App() {
   return (
@@ -37,6 +41,14 @@ function App() {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/contacts" element={<Contacts />} />
+            <Route
+              path="/game"
+              element={
+                <Suspense fallback={<main className="game-loading" />}>
+                  <Game />
+                </Suspense>
+              }
+            />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
