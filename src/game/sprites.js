@@ -4,7 +4,6 @@
 export const PPU = 1.9; // пикселей атласа на одну единицу игрового мира
 export const FRAMES = 8;
 const cache = new Map();
-const tintCache = new Map();
 
 export function loadSprite(character) {
   if (cache.has(character.id)) return cache.get(character.id);
@@ -27,25 +26,6 @@ export function loadSprite(character) {
   return job;
 }
 
-// Скин накладывает цветной оттенок на готовый спрайт (кеш на пару «блогер + скин»).
-export function skinAtlas(sprite, skin) {
-  if (!skin.tint) return sprite.img;
-  const key = `${sprite.id}:${skin.id}`;
-  let c = tintCache.get(key);
-  if (!c) {
-    c = document.createElement("canvas");
-    c.width = sprite.img.width;
-    c.height = sprite.img.height;
-    const g = c.getContext("2d");
-    g.drawImage(sprite.img, 0, 0);
-    g.globalCompositeOperation = "source-atop";
-    g.fillStyle = skin.tint;
-    g.fillRect(0, 0, c.width, c.height);
-    tintCache.set(key, c);
-  }
-  return c;
-}
-
 // Какой кадр показать в данный момент.
 export function pickFrame(state) {
   const p = state.player;
@@ -56,7 +36,7 @@ export function pickFrame(state) {
 }
 
 // x, y — точка между ступнями. scale — общий масштаб.
-export function drawSprite(ctx, { sprite, atlas, frame, x, y, spin = 0, scale = 1, aura = null, alpha = 1 }) {
+export function drawSprite(ctx, { sprite, frame, x, y, spin = 0, scale = 1, alpha = 1 }) {
   const w = sprite.cw / PPU;
   const h = sprite.ch / PPU;
   ctx.save();
@@ -68,10 +48,6 @@ export function drawSprite(ctx, { sprite, atlas, frame, x, y, spin = 0, scale = 
     ctx.translate(0, h / 2);
   }
   ctx.globalAlpha = alpha;
-  if (aura) {
-    ctx.shadowColor = aura;
-    ctx.shadowBlur = 16;
-  }
-  ctx.drawImage(atlas, frame * sprite.cw, 0, sprite.cw, sprite.ch, -w / 2, -h, w, h);
+  ctx.drawImage(sprite.img, frame * sprite.cw, 0, sprite.cw, sprite.ch, -w / 2, -h, w, h);
   ctx.restore();
 }

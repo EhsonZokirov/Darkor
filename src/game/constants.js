@@ -23,11 +23,9 @@ export const PLAYER = { w: 30, h: 74, x: 0.2 };
 export const HIT_SHRINK = 5;
 
 export const OBSTACLES = [
-  { kind: "tripod", w: 34, h: 72 },
-  { kind: "camera", w: 52, h: 44 },
-  { kind: "mic", w: 22, h: 66 },
-  { kind: "ring", w: 54, h: 76 },
-  { kind: "speaker", w: 44, h: 54 },
+  { kind: "bin", w: 38, h: 62 }, // мусорный бак
+  { kind: "barrel", w: 36, h: 56 }, // бочка
+  { kind: "dumpster", w: 58, h: 54 }, // большой контейнер
 ];
 
 // Бонусы: очки за подбор. Сумма ограничена и проверяется на сервере.

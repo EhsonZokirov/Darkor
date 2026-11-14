@@ -1,4 +1,4 @@
-// Всё, что игра помнит в браузере: рекорд, выбор персонажа, скины, звук, имя.
+// Всё, что игра помнит в браузере: рекорд, выбор персонажа, звук, имя.
 const P = "darkor_game_";
 
 function read(key, fallback) {
@@ -23,8 +23,6 @@ export const store = {
   bestByChar: () => read("bestByChar", {}),
   character: () => read("character", "abduvali"),
   setCharacter: (id) => write("character", id),
-  skin: () => read("skin", "classic"),
-  setSkin: (id) => write("skin", id),
   muted: () => Boolean(read("muted", false)),
   setMuted: (v) => write("muted", Boolean(v)),
   name: () => String(read("name", "") || ""),
