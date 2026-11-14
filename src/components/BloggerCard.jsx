@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
 import { FaInstagram, FaTiktok, FaYoutube } from "react-icons/fa";
 import { formatPrice, hasValue, priceLabel } from "../lib/format";
+import { useT } from "../i18n/lang";
 
 function BloggerCard({ blogger }) {
+  const t = useT();
   // Подсветка карточки следом за курсором (на компьютере)
   function handleMove(event) {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -21,16 +23,16 @@ function BloggerCard({ blogger }) {
       <Link
         to={`/blogger/${blogger.id}`}
         className="blogger-image-wrapper"
-        aria-label={`Профиль: ${blogger.name}`}
+        aria-label={t("Профиль: {name}", { name: blogger.name })}
       >
         <img src={blogger.image} alt={blogger.name} loading="lazy" />
-        <span className="category-badge">{blogger.category}</span>
+        <span className="category-badge">{t(blogger.category)}</span>
       </Link>
 
       <div className="blogger-info">
         <div className="name-row">
           <h3>{blogger.name}</h3>
-          <span className="verified" title="Проверенный блогер">
+          <span className="verified" title={t("Проверенный блогер")}>
             ✓
           </span>
         </div>
@@ -49,12 +51,12 @@ function BloggerCard({ blogger }) {
 
         <div className="card-bottom">
           <div>
-            <span>{priceLabel(blogger.price)}</span>
-            <strong>{formatPrice(blogger.price)}</strong>
+            <span>{priceLabel(blogger.price, t)}</span>
+            <strong>{formatPrice(blogger.price, t)}</strong>
           </div>
 
           <Link to={`/blogger/${blogger.id}`} className="details-button">
-            Подробнее
+            {t("Подробнее")}
           </Link>
         </div>
       </div>

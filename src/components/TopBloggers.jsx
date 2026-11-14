@@ -2,8 +2,10 @@ import { Link } from "react-router-dom";
 import BloggerCard from "./BloggerCard";
 import Reveal from "./Reveal";
 import { useBloggers } from "../hooks/useBloggers";
+import { useT } from "../i18n/lang";
 
 function TopBloggers() {
+  const t = useT();
   const topBloggers = useBloggers().slice(0, 3);
 
   return (
@@ -11,11 +13,11 @@ function TopBloggers() {
       <Reveal className="section-header">
         <div>
           <span className="section-label">DARKOR</span>
-          <h2>Популярные блогеры</h2>
+          <h2>{t("Популярные блогеры")}</h2>
         </div>
 
         <Link to="/bloggers" className="view-all">
-          Смотреть всех →
+          {t("Смотреть всех →")}
         </Link>
       </Reveal>
 

@@ -1,6 +1,6 @@
 import { createContext, useContext } from "react";
 
-// Значение: { user, role, loading, signIn, signUp, signOut }
+// Значение: { user, role, loading, signIn, signUp, signOut, resetPassword, updatePassword }
 export const AuthContext = createContext({
   user: null,
   role: null,
@@ -8,6 +8,8 @@ export const AuthContext = createContext({
   signIn: async () => {},
   signUp: async () => {},
   signOut: async () => {},
+  resetPassword: async () => {},
+  updatePassword: async () => {},
 });
 
 export function useAuth() {

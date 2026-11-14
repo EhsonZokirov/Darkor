@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
 import { useBloggers } from "../hooks/useBloggers";
 import CountUp from "./CountUp";
+import { useT } from "../i18n/lang";
 
 function Hero() {
+  const t = useT();
   const bloggers = useBloggers();
   const categoriesCount = new Set(bloggers.map((blogger) => blogger.category)).size;
 
@@ -18,29 +20,28 @@ function Hero() {
       <div className="hero-inner">
         <span className="pill">
           <i className="dot" />
-          Каталог блогеров Таджикистана
+          {t("Каталог блогеров Таджикистана")}
         </span>
 
         <h1>
           <span className="line" style={{ "--i": 0 }}>
-            Найдите идеального
+            {t("Найдите идеального")}
           </span>
           <span className="line" style={{ "--i": 1 }}>
-            <em>блогера</em> для рекламы
+            <em>{t("блогера")}</em> {t("для рекламы")}
           </span>
         </h1>
 
         <p className="hero-text">
-          DARKOR — это каталог авторов Таджикистана. Сравнивайте аудиторию,
-          выбирайте формат рекламы и находите того, кто продвинет ваш бизнес.
+          {t("DARKOR — это каталог авторов Таджикистана. Сравнивайте аудиторию, выбирайте формат рекламы и находите того, кто продвинет ваш бизнес.")}
         </p>
 
         <div className="hero-actions">
           <Link to="/bloggers" className="btn btn-primary">
-            Смотреть блогеров
+            {t("Смотреть блогеров")}
           </Link>
           <Link to="/add-blogger" className="btn btn-ghost">
-            Я блогер
+            {t("Я блогер")}
           </Link>
         </div>
 
@@ -49,17 +50,17 @@ function Hero() {
             <strong>
               <CountUp to={bloggers.length} />
             </strong>
-            <span>блогеров в каталоге</span>
+            <span>{t("блогеров в каталоге")}</span>
           </li>
           <li>
             <strong>
               <CountUp to={categoriesCount} />
             </strong>
-            <span>категорий контента</span>
+            <span>{t("категорий контента")}</span>
           </li>
           <li>
             <strong>TJ</strong>
-            <span>только местные авторы</span>
+            <span>{t("только местные авторы")}</span>
           </li>
         </ul>
       </div>

@@ -1,9 +1,11 @@
 import { GENDERS } from "../config";
+import { useT } from "../i18n/lang";
 
 function Chips({ title, options, value, onChange }) {
+  const t = useT();
   return (
     <div className="filter-group">
-      <span className="filter-title">{title}</span>
+      <span className="filter-title">{t(title)}</span>
 
       <div className="chips">
         <button
@@ -12,7 +14,7 @@ function Chips({ title, options, value, onChange }) {
           aria-pressed={value === ""}
           onClick={() => onChange("")}
         >
-          Все
+          {t("Все")}
         </button>
 
         {options.map((option) => (
@@ -23,7 +25,7 @@ function Chips({ title, options, value, onChange }) {
             aria-pressed={value === option}
             onClick={() => onChange(option)}
           >
-            {option}
+            {t(option)}
           </button>
         ))}
       </div>

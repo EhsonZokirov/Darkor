@@ -1,6 +1,6 @@
 // Все обращения к базе данных собраны здесь, чтобы страницы не знали про Supabase.
 import { supabase } from "./supabase";
-import { PLACEHOLDER_IMAGE } from "./format";
+import { PLACEHOLDER_IMAGE, followersText } from "./format";
 
 function check({ data, error }) {
   if (error) throw new Error(error.message);
@@ -15,9 +15,9 @@ function toBlogger(row) {
     city: row.city,
     gender: row.gender,
     category: row.category,
-    instagram: row.instagram || "—",
-    tiktok: row.tiktok || "—",
-    youtube: row.youtube || "—",
+    instagram: followersText(row.instagram) || "—",
+    tiktok: followersText(row.tiktok) || "—",
+    youtube: followersText(row.youtube) || "—",
     price: row.price || 0,
     image: row.image_url || PLACEHOLDER_IMAGE,
     description: row.description,
@@ -159,6 +159,72 @@ export async function adminListMessages() {
   );
 }
 
+// Отметить заявки/сообщения прочитанными (или вернуть в новые). Ничего не удаляет.
+export async function adminSetRead(table, ids, isRead) {
+  if (!ids.length) return;
+  check(await supabase.from(table).update({ is_read: isRead }).in("id", ids));
+}
+
+// Сколько «новых» дел у админа: непрочитанные заявки и сообщения + блогеры на проверке.
+export async function adminCountNew() {
+  const count = async (table, column, value) => {
+    const { count: n, error } = await supabase
+      .from(table)
+      .select("id", { count: "exact", head: true })
+      .eq(column, value);
+    return error ? 0 : n || 0;
+  };
+  const [ads, messages, bloggers] = await Promise.all([
+    count("ad_requests", "is_read", false),
+    count("messages", "is_read", false),
+    count("bloggers", "status", "pending"),
+  ]);
+  return { ads, messages, bloggers, total: ads + messages + bloggers };
+}
+
 export async function adminDeleteRow(table, id) {
   check(await supabase.from(table).delete().eq("id", id));
+}
+
+// Правка анкеты администратором. Статус анкеты при этом не меняется.
+export async function adminUpdateBlogger(id, fields, contact) {
+  check(await supabase.from("bloggers").update(fields).eq("id", id));
+
+  if (contact) {
+    check(await supabase.from("blogger_contacts").upsert({ blogger_id: id, contact }));
+  } else {
+    check(await supabase.from("blogger_contacts").delete().eq("blogger_id", id));
+  }
+}
+
+// ---------- SMM-специалисты ----------
+
+export async function fetchSmmSpecialists() {
+  return check(
+    await supabase
+      .from("smm_specialists")
+      .select("*")
+      .eq("published", true)
+      .order("created_at", { ascending: true })
+      .order("id", { ascending: true })
+  );
+}
+
+export async function adminListSmm() {
+  return check(
+    await supabase.from("smm_specialists").select("*").order("created_at", { ascending: false })
+  );
+}
+
+// id === null — создать нового специалиста, иначе обновить существующего.
+export async function adminSaveSmm(id, fields) {
+  if (id) {
+    check(await supabase.from("smm_specialists").update(fields).eq("id", id));
+  } else {
+    check(await supabase.from("smm_specialists").insert(fields));
+  }
+}
+
+export async function adminDeleteSmm(id) {
+  check(await supabase.from("smm_specialists").delete().eq("id", id));
 }

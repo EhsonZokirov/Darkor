@@ -1,15 +1,17 @@
 import { useMemo } from "react";
 import { useBloggers } from "../hooks/useBloggers";
+import { useT } from "../i18n/lang";
 
 // Бегущая строка под первым экраном.
 function Marquee() {
+  const t = useT();
   const bloggers = useBloggers();
 
   const row = useMemo(() => {
-    const categories = [...new Set(bloggers.map((blogger) => blogger.category))];
-    const words = [...categories, "Reels", "TikTok", "Stories", "YouTube", "Интеграции"];
+    const categories = [...new Set(bloggers.map((blogger) => t(blogger.category)))];
+    const words = [...categories, "Reels", "TikTok", "Stories", "YouTube", t("Интеграции")];
     return [...words, ...words];
-  }, [bloggers]);
+  }, [bloggers, t]);
 
   return (
     <div className="marquee" aria-hidden="true">
