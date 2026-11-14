@@ -10,7 +10,6 @@ import { useAdminBadge } from "../hooks/useAdminBadge";
 const LINKS = [
   { to: "/bloggers", label: "Блогеры" },
   { to: "/smm", label: "SMM" },
-  { to: "/game", label: "Игра" },
   { to: "/contacts", label: "Контакты" },
 ];
 
