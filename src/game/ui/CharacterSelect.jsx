@@ -1,12 +1,12 @@
 import { useRef } from "react";
 import { Link } from "react-router-dom";
-import { FaChevronLeft, FaChevronRight, FaTrophy, FaTshirt, FaVolumeUp, FaVolumeMute, FaCheck } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaTrophy, FaVolumeUp, FaVolumeMute, FaCheck } from "react-icons/fa";
 import { CHARACTERS } from "../characters";
 import RunnerPreview from "./RunnerPreview";
 import { useT } from "../../i18n/lang";
 
 // Экран выбора блогера: карточки, свайпы, «Выбрать» и «Играть».
-function CharacterSelect({ focus, chosen, faces, skin, bestByChar, name, muted, onFocus, onChoose, onPlay, onSkins, onBoard, onToggleSound, onName }) {
+function CharacterSelect({ focus, chosen, faces, skin, bestByChar, name, muted, onFocus, onChoose, onPlay, onBoard, onToggleSound, onName }) {
   const t = useT();
   const drag = useRef(null);
   const current = CHARACTERS[focus];
@@ -101,7 +101,6 @@ function CharacterSelect({ focus, chosen, faces, skin, bestByChar, name, muted, 
       </div>
 
       <div className="select-links">
-        <button type="button" onClick={onSkins}><FaTshirt /> {t("Скины")}</button>
         <button type="button" onClick={onBoard}><FaTrophy /> {t("Рейтинг")}</button>
       </div>
 

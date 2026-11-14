@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { drawCharacter } from "../drawer";
-import { drawSprite, skinAtlas } from "../sprites";
+import { drawSprite } from "../sprites";
 
 // Живое превью выбранного блогера: бежит на месте, по нажатию прыгает.
 function RunnerPreview({ face, skin, sprite }) {
@@ -36,7 +36,7 @@ function RunnerPreview({ face, skin, sprite }) {
         // готовый спрайт: стоит и «дышит», по нажатию прыгает
         const breathe = reduced ? 1 : 1 + Math.sin(ts / 380) * 0.012;
         const frame = lift > 1 ? 6 : 0;
-        drawSprite(g, { sprite, atlas: skinAtlas(sprite, skin), frame, x: c.width / 2, y: c.height - 14 - lift, scale: 1.05 * breathe, aura: skin.aura });
+        drawSprite(g, { sprite, frame, x: c.width / 2, y: c.height - 14 - lift, scale: 1.05 * breathe });
       } else {
         drawCharacter(g, { face, skin, x: c.width / 2, y: c.height - 14 - lift, phase, air: lift > 1, scale: 1.25 });
       }

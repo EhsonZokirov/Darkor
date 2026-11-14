@@ -1,6 +1,6 @@
 // Персонажи и скины. Лицо берётся из фото блогера; если фото нет —
 // рисуется мультяшное лицо по параметрам cartoon.
-// Лица лежат в public/game/faces/<id>.jpg (квадрат 256×256). outfit — одежда в скине «Классика».
+// Лица лежат в public/game/faces/<id>.jpg (квадрат 256×256). outfit — одежда блогера в запасном режиме.
 export const CHARACTERS = [
   {
     id: "abduvali",
@@ -49,18 +49,12 @@ export const CHARACTERS = [
   },
 ];
 
-// Скины открываются по количеству собранных бонусов за всё время.
-export const SKINS = [
-  { id: "classic", name: "Классика", top: "#3a3f66", pants: "#2f3350", shoes: "#f4f4f7", accent: "#ff2b3a", tint: null, aura: null, unlock: 0 },
-  { id: "neon", name: "Неон", top: "#ff2b3a", pants: "#1c1c26", shoes: "#ffd7da", accent: "#ffffff", tint: "rgba(255,43,58,.3)", aura: "#ff2b3a", unlock: 40 },
-  { id: "gold", name: "Золото", top: "#d9a441", pants: "#3a2e17", shoes: "#fff3cf", accent: "#7a1018", tint: "rgba(255,196,64,.32)", aura: "#ffc94a", unlock: 120 },
-  { id: "ice", name: "Лёд", top: "#2fb7e8", pants: "#17324a", shoes: "#e6f8ff", accent: "#ffffff", tint: "rgba(60,190,255,.32)", aura: "#3fd0ff", unlock: 250 },
-];
+// Внешний вид для запасного режима (когда нет готового спрайта).
+export const DEFAULT_SKIN = { top: "#3a3f66", pants: "#2f3350", shoes: "#f4f4f7", accent: "#ff2b3a" };
 
 export const getCharacter = (id) => CHARACTERS.find((c) => c.id === id) || CHARACTERS[0];
-export const getSkin = (id) => SKINS.find((s) => s.id === id) || SKINS[0];
 
-// «Классика» у каждого блогера в его собственной одежде, остальные скины — общие.
-export function skinFor(character, skin) {
-  return skin.id === "classic" && character.outfit ? { ...skin, ...character.outfit } : skin;
+// Одежда блогера поверх общего вида.
+export function lookFor(character) {
+  return character.outfit ? { ...DEFAULT_SKIN, ...character.outfit } : DEFAULT_SKIN;
 }
