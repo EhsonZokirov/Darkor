@@ -51,10 +51,10 @@ export const CHARACTERS = [
 
 // Скины открываются по количеству собранных бонусов за всё время.
 export const SKINS = [
-  { id: "classic", name: "Классика", top: "#3a3f66", pants: "#2f3350", shoes: "#f4f4f7", accent: "#ff2b3a", unlock: 0 },
-  { id: "neon", name: "Неон", top: "#ff2b3a", pants: "#1c1c26", shoes: "#ffd7da", accent: "#ffffff", unlock: 40 },
-  { id: "gold", name: "Золото", top: "#d9a441", pants: "#3a2e17", shoes: "#fff3cf", accent: "#7a1018", unlock: 120 },
-  { id: "ice", name: "Лёд", top: "#2fb7e8", pants: "#17324a", shoes: "#e6f8ff", accent: "#ffffff", unlock: 250 },
+  { id: "classic", name: "Классика", top: "#3a3f66", pants: "#2f3350", shoes: "#f4f4f7", accent: "#ff2b3a", tint: null, aura: null, unlock: 0 },
+  { id: "neon", name: "Неон", top: "#ff2b3a", pants: "#1c1c26", shoes: "#ffd7da", accent: "#ffffff", tint: "rgba(255,43,58,.3)", aura: "#ff2b3a", unlock: 40 },
+  { id: "gold", name: "Золото", top: "#d9a441", pants: "#3a2e17", shoes: "#fff3cf", accent: "#7a1018", tint: "rgba(255,196,64,.32)", aura: "#ffc94a", unlock: 120 },
+  { id: "ice", name: "Лёд", top: "#2fb7e8", pants: "#17324a", shoes: "#e6f8ff", accent: "#ffffff", tint: "rgba(60,190,255,.32)", aura: "#3fd0ff", unlock: 250 },
 ];
 
 export const getCharacter = (id) => CHARACTERS.find((c) => c.id === id) || CHARACTERS[0];

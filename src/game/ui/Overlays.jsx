@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { FaHeart, FaUserPlus, FaEye, FaGem, FaTrophy, FaLock, FaCheck } from "react-icons/fa";
 import { CHARACTERS, SKINS, getCharacter, skinFor } from "../characters";
 import { drawCharacter } from "../drawer";
+import { drawSprite, skinAtlas } from "../sprites";
 import { useT, useLang } from "../../i18n/lang";
 
 export function Countdown({ value }) {
@@ -132,15 +133,16 @@ export function Leaderboard({ tab, onTab, local, remote, remoteState, online, us
   );
 }
 
-function SkinPreview({ face, skin }) {
+function SkinPreview({ face, skin, sprite }) {
   const ref = useRef(null);
   useEffect(() => {
     const c = ref.current;
     const g = c.getContext("2d");
     g.clearRect(0, 0, c.width, c.height);
     g.setTransform(1, 0, 0, 1, 0, 0);
-    drawCharacter(g, { face, skin, x: c.width / 2, y: c.height - 8, phase: 0.6, air: false, scale: 0.95 });
-  }, [face, skin]);
+    if (sprite) drawSprite(g, { sprite, atlas: skinAtlas(sprite, skin), frame: 0, x: c.width / 2, y: c.height - 6, scale: 0.78, aura: skin.aura });
+    else drawCharacter(g, { face, skin, x: c.width / 2, y: c.height - 8, phase: 0.6, air: false, scale: 0.95 });
+  }, [face, skin, sprite]);
   return <canvas ref={ref} width="120" height="130" aria-hidden="true" />;
 }
 
@@ -166,7 +168,7 @@ export function Skins({ characterId, faces, skinId, picked, onPick, onClose }) {
                 data-skin={s.id}
                 aria-pressed={active}
               >
-                <SkinPreview face={faces[char.id]?.canvas} skin={skinFor(char, s)} />
+                <SkinPreview face={faces[char.id]?.canvas} sprite={faces[char.id]?.sprite} skin={skinFor(char, s)} />
                 <strong>{t(s.name)}</strong>
                 <span>
                   {locked ? <><FaLock /> {t("Нужно бонусов: {n}", { n: s.unlock })}</> : active ? <><FaCheck /> {t("Надет")}</> : t("Надеть")}

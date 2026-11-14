@@ -154,7 +154,7 @@ function Game() {
   // Внешний вид персонажа на сцене
   useEffect(() => {
     const face = faces[lookCharId]?.canvas;
-    sessionRef.current?.setLook(face, skinFor(getCharacter(lookCharId), activeSkin));
+    sessionRef.current?.setLook(face, skinFor(getCharacter(lookCharId), activeSkin), faces[lookCharId]?.sprite || null);
   }, [faces, lookCharId, activeSkin]);
 
   useEffect(() => {

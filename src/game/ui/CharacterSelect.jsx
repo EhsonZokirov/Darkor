@@ -42,7 +42,7 @@ function CharacterSelect({ focus, chosen, faces, skin, bestByChar, name, muted, 
           <FaChevronLeft />
         </button>
 
-        <RunnerPreview face={faces[current.id]?.canvas} skin={skin} key={current.id} />
+        <RunnerPreview face={faces[current.id]?.canvas} sprite={faces[current.id]?.sprite} skin={skin} key={current.id} />
 
         <button type="button" className="arrow right" onClick={() => go(1)} aria-label={t("Следующий")}>
           <FaChevronRight />
@@ -65,8 +65,14 @@ function CharacterSelect({ focus, chosen, faces, skin, bestByChar, name, muted, 
             onClick={() => onFocus(i)}
             data-char={c.id}
           >
-            <span className="pick-face">
-              {faces[c.id]?.url ? <img src={faces[c.id].url} alt="" draggable="false" /> : <i />}
+            <span className={`pick-face ${faces[c.id]?.sprite ? "sprite" : ""}`}>
+              {faces[c.id]?.sprite ? (
+                <img src={faces[c.id].sprite.idleUrl} alt="" draggable="false" />
+              ) : faces[c.id]?.url ? (
+                <img src={faces[c.id].url} alt="" draggable="false" />
+              ) : (
+                <i />
+              )}
             </span>
             <span className="pick-name">{c.name}</span>
             {chosen === c.id && <span className="pick-check"><FaCheck /></span>}

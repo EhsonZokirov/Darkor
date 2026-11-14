@@ -7,7 +7,7 @@ import { SPEED } from "./constants";
 export function createSession({ canvas, host, sound, reducedMotion, onHud, onOver, onPause, onResume }) {
   const renderer = createRenderer(canvas, { reducedMotion });
   let engine = createEngine({ width: renderer.resize(), seed: Date.now() });
-  const intro = { dist: 0, speed: SPEED.start, player: { y: 0, grounded: true, spin: 0 }, obstacles: [], pickups: [], over: false };
+  const intro = { dist: 0, time: 0, speed: SPEED.start, player: { y: 0, grounded: true, spin: 0, landed: 0, airStart: 0 }, obstacles: [], pickups: [], over: false };
 
   let mode = "intro"; // intro | play | over
   let paused = false;
@@ -49,13 +49,17 @@ export function createSession({ canvas, host, sound, reducedMotion, onHud, onOve
       }
     } else if (mode === "intro") {
       intro.dist += intro.speed * dt;
+      intro.time += dt;
       // лёгкий прыжок в превью, чтобы персонаж был «живым»
       if (introJump > 0) {
         introJump -= dt;
         const k = 1 - introJump / 0.6;
         intro.player.y = Math.max(0, Math.sin(k * Math.PI) * 70);
         intro.player.grounded = introJump <= 0;
-        if (introJump <= 0) intro.player.y = 0;
+        if (introJump <= 0) {
+          intro.player.y = 0;
+          intro.player.landed = intro.time;
+        }
       }
       renderer.draw(intro, now, { events: [], hidePlayer: hidden });
     } else if (mode === "over") {
@@ -79,6 +83,7 @@ export function createSession({ canvas, host, sound, reducedMotion, onHud, onOve
     else if (mode === "intro" && introJump <= 0) {
       introJump = 0.6;
       intro.player.grounded = false;
+      intro.player.airStart = intro.time;
       sound.play("jump");
     }
   }
@@ -121,8 +126,8 @@ export function createSession({ canvas, host, sound, reducedMotion, onHud, onOve
     get state() {
       return mode === "intro" ? intro : engine.state;
     },
-    setLook(face, skin) {
-      renderer.setLook(face, skin);
+    setLook(face, skin, sprite) {
+      renderer.setLook(face, skin, sprite);
       ensureLoop();
     },
     start() {
