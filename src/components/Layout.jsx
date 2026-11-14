@@ -18,7 +18,7 @@ function Layout() {
       </div>
 
       {/* Реклама партнёра на всех страницах. На главной она стоит внутри страницы. */}
-      {pathname !== "/" && pathname !== "/admin" && <SponsorBanner compact />}
+      {pathname !== "/" && pathname !== "/admin" && pathname !== "/game" && <SponsorBanner compact />}
 
       <Footer />
     </>
