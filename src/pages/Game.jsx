@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "../game/game.css";
 import { useAuth } from "../context/auth";
-import { CHARACTERS, SKINS, getCharacter, getSkin } from "../game/characters";
+import { CHARACTERS, getCharacter, lookFor } from "../game/characters";
 import { createSession } from "../game/session";
 import { createSound } from "../game/sound";
 import { store } from "../game/storage";
@@ -9,7 +9,7 @@ import { ONLINE, startRun, finishRun, fetchTop } from "../game/leaderboard";
 import { useFaces } from "../game/ui/useFaces";
 import Hud from "../game/ui/Hud";
 import CharacterSelect from "../game/ui/CharacterSelect";
-import { Countdown, PauseMenu, GameOver, Leaderboard, Skins } from "../game/ui/Overlays";
+import { Countdown, PauseMenu, GameOver, Leaderboard } from "../game/ui/Overlays";
 
 const reducedMotion = () =>
   typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
@@ -30,17 +30,15 @@ function Game() {
   const nameRef = useRef(store.name());
 
   const [screen, setScreen] = useState("select"); // select | countdown | play | over
-  const [overlay, setOverlay] = useState(null); // null | skins | board
+  const [overlay, setOverlay] = useState(null); // null | board
   const [paused, setPaused] = useState(false);
   const [count, setCount] = useState(3);
   const [chosen, setChosen] = useState(() => getCharacter(store.character()).id);
   const [focus, setFocus] = useState(() => Math.max(0, CHARACTERS.findIndex((c) => c.id === store.character())));
-  const [skinId, setSkinId] = useState(() => store.skin());
   const [muted, setMuted] = useState(() => store.muted());
   const [name, setName] = useState(() => store.name());
   const [best, setBest] = useState(() => store.best());
   const [bestByChar, setBestByChar] = useState(() => store.bestByChar());
-  const [picked, setPicked] = useState(() => store.pickedTotal());
   const [result, setResult] = useState(null);
   const [newBest, setNewBest] = useState(false);
   const [sync, setSync] = useState({ status: "local" });
@@ -52,19 +50,13 @@ function Game() {
   userRef.current = user;
   nameRef.current = name;
 
-  // Скин, который надет сейчас (если он ещё закрыт — классика).
-  const activeSkin = useMemo(() => {
-    const s = getSkin(skinId);
-    return picked >= s.unlock ? s : SKINS[0];
-  }, [skinId, picked]);
-
   const lookCharId = screen === "select" ? CHARACTERS[focus].id : playCharRef.current;
 
   // ---- HUD: обновляем цифры напрямую, без перерисовки React ----
   const onHud = useCallback((state) => {
     const host = hostRef.current;
     if (!host) return;
-    if (!hudEls.current) {
+    if (!hudEls.current || !hudEls.current.score?.isConnected) {
       const map = {};
       host.querySelectorAll("[data-hud]").forEach((el) => (map[el.dataset.hud] = el));
       hudEls.current = map;
@@ -96,7 +88,6 @@ function Game() {
     const { newBest: isBest } = store.saveRun({ score: summary.score, character, counts: summary.counts, name: playerName });
     setBest(store.best());
     setBestByChar(store.bestByChar());
-    setPicked(store.pickedTotal());
     setLocalRuns(store.runs());
     setResult(summary);
     setNewBest(isBest);
@@ -154,8 +145,8 @@ function Game() {
   // Внешний вид персонажа на сцене
   useEffect(() => {
     const face = faces[lookCharId]?.canvas;
-    sessionRef.current?.setLook(face, activeSkin);
-  }, [faces, lookCharId, activeSkin]);
+    sessionRef.current?.setLook(face, lookFor(getCharacter(lookCharId)), faces[lookCharId]?.sprite || null);
+  }, [faces, lookCharId]);
 
   useEffect(() => {
     sessionRef.current?.setSelecting(screen === "select");
@@ -299,14 +290,13 @@ function Game() {
             focus={focus}
             chosen={chosen}
             faces={faces}
-            skin={activeSkin}
+            skin={lookFor(CHARACTERS[focus])}
             bestByChar={bestByChar}
             name={name}
             muted={muted}
             onFocus={setFocus}
             onChoose={choose}
             onPlay={play}
-            onSkins={() => setOverlay("skins")}
             onBoard={openBoard}
             onToggleSound={toggleSound}
             onName={changeName}
@@ -344,19 +334,6 @@ function Game() {
           />
         )}
 
-        {overlay === "skins" && (
-          <Skins
-            characterId={CHARACTERS[focus].id}
-            faces={faces}
-            skinId={activeSkin.id}
-            picked={picked}
-            onPick={(id) => {
-              setSkinId(id);
-              store.setSkin(id);
-            }}
-            onClose={() => setOverlay(null)}
-          />
-        )}
       </div>
       <noscript>DAVODAVSHIK requires JavaScript.</noscript>
     </main>

@@ -1,12 +1,12 @@
 import { useRef } from "react";
 import { Link } from "react-router-dom";
-import { FaChevronLeft, FaChevronRight, FaTrophy, FaTshirt, FaVolumeUp, FaVolumeMute, FaCheck } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaTrophy, FaVolumeUp, FaVolumeMute, FaCheck } from "react-icons/fa";
 import { CHARACTERS } from "../characters";
 import RunnerPreview from "./RunnerPreview";
 import { useT } from "../../i18n/lang";
 
 // Экран выбора блогера: карточки, свайпы, «Выбрать» и «Играть».
-function CharacterSelect({ focus, chosen, faces, skin, bestByChar, name, muted, onFocus, onChoose, onPlay, onSkins, onBoard, onToggleSound, onName }) {
+function CharacterSelect({ focus, chosen, faces, skin, bestByChar, name, muted, onFocus, onChoose, onPlay, onBoard, onToggleSound, onName }) {
   const t = useT();
   const drag = useRef(null);
   const current = CHARACTERS[focus];
@@ -42,7 +42,7 @@ function CharacterSelect({ focus, chosen, faces, skin, bestByChar, name, muted, 
           <FaChevronLeft />
         </button>
 
-        <RunnerPreview face={faces[current.id]?.canvas} skin={skin} key={current.id} />
+        <RunnerPreview face={faces[current.id]?.canvas} sprite={faces[current.id]?.sprite} skin={skin} key={current.id} />
 
         <button type="button" className="arrow right" onClick={() => go(1)} aria-label={t("Следующий")}>
           <FaChevronRight />
@@ -65,8 +65,14 @@ function CharacterSelect({ focus, chosen, faces, skin, bestByChar, name, muted, 
             onClick={() => onFocus(i)}
             data-char={c.id}
           >
-            <span className="pick-face">
-              {faces[c.id]?.url ? <img src={faces[c.id].url} alt="" draggable="false" /> : <i />}
+            <span className={`pick-face ${faces[c.id]?.sprite ? "sprite" : ""}`}>
+              {faces[c.id]?.sprite ? (
+                <img src={faces[c.id].sprite.idleUrl} alt="" draggable="false" />
+              ) : faces[c.id]?.url ? (
+                <img src={faces[c.id].url} alt="" draggable="false" />
+              ) : (
+                <i />
+              )}
             </span>
             <span className="pick-name">{c.name}</span>
             {chosen === c.id && <span className="pick-check"><FaCheck /></span>}
@@ -95,7 +101,6 @@ function CharacterSelect({ focus, chosen, faces, skin, bestByChar, name, muted, 
       </div>
 
       <div className="select-links">
-        <button type="button" onClick={onSkins}><FaTshirt /> {t("Скины")}</button>
         <button type="button" onClick={onBoard}><FaTrophy /> {t("Рейтинг")}</button>
       </div>
 

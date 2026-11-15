@@ -2,6 +2,7 @@
 // Слои один раз рисуются в «плитки» (offscreen canvas), потом только сдвигаются.
 import { WORLD_H, GROUND_Y, PLAYER } from "./constants";
 import { drawCharacter } from "./drawer";
+import { drawSprite, pickFrame } from "./sprites";
 import { createRng } from "./rng";
 
 const TILE_W = 960;
@@ -76,12 +77,13 @@ function buildTiles() {
     }
   });
 
+  // Крупные дома без вывесок и надписей: только окна.
   const signs = tile((g) => {
     const items = [
-      { x: 20, w: 110, h: 210, text: "DARKOR", v: true },
-      { x: 220, w: 150, h: 170, text: "ДУШАНБЕ", v: false },
-      { x: 470, w: 100, h: 240, text: "BLOG", v: true },
-      { x: 650, w: 170, h: 190, text: "DAVODAVSHIK", v: false },
+      { x: 20, w: 110, h: 210 },
+      { x: 220, w: 150, h: 170 },
+      { x: 470, w: 100, h: 240 },
+      { x: 650, w: 170, h: 190 },
     ];
     for (const b of items) {
       g.fillStyle = "#0f0a15";
@@ -96,27 +98,6 @@ function buildTiles() {
           }
         }
       }
-      // неоновая вывеска
-      g.save();
-      g.shadowColor = RED;
-      g.shadowBlur = 18;
-      g.strokeStyle = RED;
-      g.fillStyle = "#fff";
-      g.lineWidth = 2;
-      if (b.v) {
-        const sx = b.x + b.w / 2;
-        g.font = "800 20px Unbounded, Manrope, sans-serif";
-        g.textAlign = "center";
-        [...b.text].forEach((ch, i) => g.fillText(ch, sx, GROUND_Y - b.h + 38 + i * 24));
-        g.strokeRect(b.x + 12, GROUND_Y - b.h + 12, b.w - 24, b.text.length * 24 + 40);
-      } else {
-        const cy = GROUND_Y - b.h + 34;
-        g.strokeRect(b.x + 8, cy - 22, b.w - 16, 34);
-        g.font = `800 ${b.text.length > 8 ? 15 : 18}px Unbounded, Manrope, sans-serif`;
-        g.textAlign = "center";
-        g.fillText(b.text, b.x + b.w / 2, cy + 2);
-      }
-      g.restore();
     }
   });
 
@@ -154,6 +135,7 @@ export function createRenderer(canvas, { reducedMotion = false } = {}) {
   let shake = 0;
   let face = null;
   let skin = null;
+  let sprite = null;
   let lastNow = 0;
   let scale = 1;
   let visibleH = WORLD_H;
@@ -261,80 +243,115 @@ export function createRenderer(canvas, { reducedMotion = false } = {}) {
     for (let x = off; x < W; x += gap) ctx.fillRect(x, GROUND_Y + 46, 56, 4);
   }
 
-  function drawObstacle(o, now) {
+  // Препятствия: мусорные баки, контейнеры и бочки.
+  function drawObstacle(o) {
     ctx.save();
     ctx.translate(o.x, GROUND_Y);
-    ctx.lineWidth = 2.5;
-    ctx.strokeStyle = RED;
-    ctx.fillStyle = "#1b1b27";
+    ctx.lineWidth = 2;
     ctx.lineCap = "round";
-    const w = o.w;
-    const h = o.h;
+    ctx.lineJoin = "round";
     ctx.shadowColor = RED;
     ctx.shadowBlur = 8;
-    if (o.kind === "tripod") {
-      ctx.beginPath();
-      ctx.moveTo(w / 2, -h + 14);
-      ctx.lineTo(0, 0);
-      ctx.moveTo(w / 2, -h + 14);
-      ctx.lineTo(w / 2, 0);
-      ctx.moveTo(w / 2, -h + 14);
-      ctx.lineTo(w, 0);
-      ctx.stroke();
-      ctx.fillRect(w / 2 - 14, -h, 28, 16);
-      ctx.strokeRect(w / 2 - 14, -h, 28, 16);
-    } else if (o.kind === "camera") {
-      ctx.beginPath();
-      ctx.roundRect(0, -h, w, h, 6);
-      ctx.fill();
-      ctx.stroke();
+    const w = o.w;
+    const h = o.h;
+
+    const wheel = (cx) => {
       ctx.fillStyle = "#0a0a10";
       ctx.beginPath();
-      ctx.arc(w * 0.62, -h / 2, h * 0.3, 0, Math.PI * 2);
+      ctx.arc(cx, -4, 5, 0, Math.PI * 2);
+      ctx.fill();
+    };
+
+    if (o.kind === "barrel") {
+      ctx.fillStyle = "#3a4a63";
+      ctx.strokeStyle = "#ff5a5f";
+      ctx.beginPath();
+      ctx.moveTo(3, 0);
+      ctx.quadraticCurveTo(-3, -h / 2, 3, -h + 6);
+      ctx.lineTo(w - 3, -h + 6);
+      ctx.quadraticCurveTo(w + 3, -h / 2, w - 3, 0);
+      ctx.closePath();
       ctx.fill();
       ctx.stroke();
-      if (Math.floor(now * 2) % 2 === 0) {
-        ctx.fillStyle = RED;
+      ctx.shadowBlur = 0;
+      // обручи
+      ctx.strokeStyle = "rgba(255,255,255,.4)";
+      ctx.lineWidth = 2.5;
+      for (const y of [-h * 0.25, -h * 0.55, -h * 0.85]) {
         ctx.beginPath();
-        ctx.arc(8, -h + 9, 3.5, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    } else if (o.kind === "mic") {
-      ctx.beginPath();
-      ctx.moveTo(w / 2, -h + 22);
-      ctx.lineTo(w / 2, 0);
-      ctx.moveTo(w * 0.1, 0);
-      ctx.lineTo(w * 0.9, 0);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.ellipse(w / 2, -h + 12, w * 0.4, 14, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
-    } else if (o.kind === "ring") {
-      ctx.beginPath();
-      ctx.moveTo(w / 2, -34);
-      ctx.lineTo(w / 2, 0);
-      ctx.moveTo(w * 0.2, 0);
-      ctx.lineTo(w * 0.8, 0);
-      ctx.stroke();
-      ctx.strokeStyle = "#fff";
-      ctx.shadowColor = "#fff";
-      ctx.lineWidth = 5;
-      ctx.beginPath();
-      ctx.arc(w / 2, -h + 26, 22, 0, Math.PI * 2);
-      ctx.stroke();
-    } else {
-      ctx.beginPath();
-      ctx.roundRect(0, -h, w, h, 5);
-      ctx.fill();
-      ctx.stroke();
-      ctx.fillStyle = "#0a0a10";
-      for (const cy of [-h * 0.68, -h * 0.28]) {
-        ctx.beginPath();
-        ctx.arc(w / 2, cy, 8, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.moveTo(1, y);
+        ctx.lineTo(w - 1, y);
         ctx.stroke();
       }
+      // крышка
+      ctx.fillStyle = "#566884";
+      ctx.beginPath();
+      ctx.ellipse(w / 2, -h + 6, w / 2 - 3, 6, 0, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (o.kind === "bin") {
+      ctx.fillStyle = "#1f4a36";
+      ctx.strokeStyle = "#ff5a5f";
+      // корпус немного сужается книзу
+      ctx.beginPath();
+      ctx.moveTo(3, -h + 10);
+      ctx.lineTo(w - 3, -h + 10);
+      ctx.lineTo(w - 7, -8);
+      ctx.lineTo(7, -8);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      // крышка с ручкой
+      ctx.fillStyle = "#2b6a4c";
+      ctx.beginPath();
+      ctx.roundRect(0, -h, w, 11, 4);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255,255,255,.5)";
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(w / 2 - 7, -h - 1);
+      ctx.lineTo(w / 2 + 7, -h - 1);
+      ctx.stroke();
+      // рёбра
+      ctx.strokeStyle = "rgba(0,0,0,.35)";
+      ctx.lineWidth = 2;
+      for (const x of [w * 0.3, w * 0.5, w * 0.7]) {
+        ctx.beginPath();
+        ctx.moveTo(x, -h + 16);
+        ctx.lineTo(x + (x - w / 2) * -0.12, -14);
+        ctx.stroke();
+      }
+      wheel(9);
+      wheel(w - 9);
+    } else {
+      // большой контейнер
+      ctx.fillStyle = "#24385a";
+      ctx.strokeStyle = "#ff5a5f";
+      ctx.beginPath();
+      ctx.roundRect(0, -h + 8, w, h - 12, 4);
+      ctx.fill();
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      // скошенная крышка
+      ctx.fillStyle = "#2f4a78";
+      ctx.beginPath();
+      ctx.moveTo(-2, -h + 10);
+      ctx.lineTo(w + 2, -h + 10);
+      ctx.lineTo(w - 4, -h);
+      ctx.lineTo(4, -h);
+      ctx.closePath();
+      ctx.fill();
+      // горизонтальные рёбра
+      ctx.strokeStyle = "rgba(255,255,255,.22)";
+      ctx.lineWidth = 2;
+      for (const y of [-h * 0.62, -h * 0.34]) {
+        ctx.beginPath();
+        ctx.moveTo(3, y);
+        ctx.lineTo(w - 3, y);
+        ctx.stroke();
+      }
+      wheel(9);
+      wheel(w - 9);
     }
     ctx.restore();
   }
@@ -430,7 +447,7 @@ export function createRenderer(canvas, { reducedMotion = false } = {}) {
     drawGround(state.dist);
 
     for (const b of state.pickups || []) drawPickup(b, now);
-    for (const o of state.obstacles || []) drawObstacle(o, now);
+    for (const o of state.obstacles || []) drawObstacle(o);
 
     // тень и персонаж
     const p = state.player;
@@ -442,7 +459,15 @@ export function createRenderer(canvas, { reducedMotion = false } = {}) {
       ctx.fill();
     }
 
-    if (skin && !opts.hidePlayer) {
+    if (sprite && !opts.hidePlayer) {
+      drawSprite(ctx, {
+        sprite,
+        frame: pickFrame(state),
+        x: px,
+        y: GROUND_Y - p.y,
+        spin: p.spin,
+      });
+    } else if (skin && !opts.hidePlayer) {
       drawCharacter(ctx, {
         face,
         skin,
@@ -487,9 +512,10 @@ export function createRenderer(canvas, { reducedMotion = false } = {}) {
     get width() {
       return W;
     },
-    setLook(nextFace, nextSkin) {
+    setLook(nextFace, nextSkin, nextSprite = null) {
       face = nextFace;
       skin = nextSkin;
+      sprite = nextSprite;
     },
   };
 }

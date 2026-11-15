@@ -274,16 +274,6 @@
 .board-empty { text-align: center; color: #a9a9ba; padding: 18px !important; }
 @keyframes row-in { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: none; } }
 
-.skin-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-.skin-card {
-  display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px; border-radius: 16px; cursor: pointer; color: #fff; font: inherit;
-  background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.14); transition: transform 0.25s var(--ease), border-color 0.25s;
-}
-.skin-card:hover:not(:disabled) { transform: translateY(-4px); border-color: var(--g-red); }
-.skin-card.active { border-color: var(--g-red); box-shadow: 0 0 22px -4px rgba(255, 43, 58, 0.8); }
-.skin-card.locked { opacity: 0.55; cursor: not-allowed; }
-.skin-card canvas { width: 90px; height: 98px; }
-.skin-card span { font-size: 11px; color: #cfcfdb; display: inline-flex; gap: 4px; align-items: center; }
 
 @media (max-width: 380px) {
   .select-nick { display: none; }
@@ -302,3 +292,9 @@
   .runner-preview { max-width: 180px; }
   .game-title { font-size: clamp(24px, 7vw, 38px); }
 }
+
+/* Карточка со спрайтом: показываем фигуру целиком, без круглой рамки */
+.pick-face.sprite { width: auto; height: 62px; aspect-ratio: auto; border: 0; border-radius: 0; background: none; overflow: visible; display: flex; justify-content: center; }
+.pick-face.sprite img { width: auto; height: 100%; object-fit: contain; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6)); }
+.pick-card.focus .pick-face.sprite { border: 0; }
+.pick-card { padding-top: 12px; }

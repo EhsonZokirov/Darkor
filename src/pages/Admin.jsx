@@ -4,6 +4,7 @@ import { FiCheck, FiCheckCircle, FiRotateCcw } from "react-icons/fi";
 import BloggerEditor from "../components/BloggerEditor";
 import { useAuth } from "../context/auth";
 import SmmEditor from "../components/SmmEditor";
+import AdsManager from "../components/AdsManager";
 import { BACKEND_ENABLED } from "../lib/supabase";
 import {
   adminDeleteBlogger,
@@ -230,6 +231,7 @@ function Admin() {
     { value: "ads", label: "Заявки на рекламу", count: readSupported ? newAds.length : data.ads.length },
     { value: "messages", label: "Сообщения", count: readSupported ? newMessages.length : data.messages.length },
     { value: "smm", label: "SMM-специалисты", count: 0 },
+    { value: "banners", label: "Баннеры", count: 0 },
   ];
 
   return (
@@ -447,6 +449,8 @@ function Admin() {
           </div>
         </>
       )}
+
+      {data.loaded && tab === "banners" && <AdsManager adminId={user.id} />}
 
       {data.loaded && tab === "smm" && (
         <div className="admin-list">

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
+import { FaGamepad } from "react-icons/fa";
 import Logo from "./Logo";
 import { useAuth } from "../context/auth";
 import { useLang } from "../i18n/lang";
@@ -10,7 +11,6 @@ import { useAdminBadge } from "../hooks/useAdminBadge";
 const LINKS = [
   { to: "/bloggers", label: "Блогеры" },
   { to: "/smm", label: "SMM" },
-  { to: "/game", label: "Игра" },
   { to: "/contacts", label: "Контакты" },
 ];
 
@@ -111,6 +111,14 @@ function Navbar() {
           </Link>
 
           <ThemeToggle />
+
+          <NavLink
+            to="/game"
+            onClick={closeMenu}
+            className={({ isActive }) => `nav-game ${isActive ? "active" : ""}`}
+          >
+            <FaGamepad aria-hidden="true" /> Game
+          </NavLink>
 
           <div className="lang-switch" role="group" aria-label={t("Язык")}>
             {[
