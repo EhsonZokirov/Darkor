@@ -24,7 +24,7 @@ begin
   insert into public.profiles (id) values (new.id) on conflict do nothing;
   return new;
 end;
-$$;
+$$;ва
 
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
