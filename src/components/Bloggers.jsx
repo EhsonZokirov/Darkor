@@ -46,27 +46,6 @@ function Bloggers() {
 
   return (
     <main className="bloggers-page">
-      <section className="page-hero">
-        <div className="page-hero-bg" aria-hidden="true">
-          <span className="orb orb-1" />
-          <span className="orb orb-2" />
-        </div>
-
-        <div className="page-hero-content">
-          <span className="section-label">DARKOR / CREATORS</span>
-
-          <h1>
-            {t("Найди блогера")}
-            <br />
-            <span>{t("для своей рекламы")}</span>
-          </h1>
-
-          <p>
-            {t("Исследуй блогеров Таджикистана, сравнивай аудиторию и находи подходящего автора для продвижения своего бренда.")}
-          </p>
-        </div>
-      </section>
-
       <section className="bloggers section">
         <div className="bloggers-section-header">
           <div>
