@@ -1073,7 +1073,7 @@ h3 {
 }
 
 .social-stats {
-  display: flex;
+  display: grid;
   gap: 8px;
   margin-bottom: 20px;
 }
